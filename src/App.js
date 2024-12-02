@@ -1,26 +1,33 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Home } from './components/Home';
+import { PlantBox } from './components/PlantBox';
+import styled from 'styled-components';
 
-function App() {
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  background-color: #f0f0f0;
+`;
+
+export const App = () => {
+  const lights = useSelector((state) => state.light.lights || []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <Router>
+      <Wrapper>
+        <Routes>
+          {/* Home route */}
+          <Route path="/" element={<Home />} />
 
-export default App;
+          {/* Single dynamic route to handle all plantbox pages */}
+          <Route path="/plantbox/:id" element={<PlantBox />} />
+        </Routes>
+      </Wrapper>
+    </Router>
+  );
+};
