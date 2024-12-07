@@ -2,8 +2,8 @@ import styled, { css } from 'styled-components';
 
 // Container for the grow light controls
 export const Box = styled.div`
-  width: 28%;
-  height: auto; /* Adjust for dynamic height based on content */
+  width: 30%;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -158,20 +158,5 @@ export const SubmitButton = styled.button`
   @media (max-width: 768px) {
     width: 100%;
     font-size: 16px;
-  }
-`;
-
-// Wrapper for consistency in layouts
-export const Wrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px;
-  background-color: #f4f4f9;
-
-  @media (max-width: 768px) {
-    padding: 10px;
   }
 `;
