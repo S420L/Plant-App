@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setCurrentLight } from '../../data/slice';
+import { setCurrentLight, toggleLightState } from '../../data/slice';
 import { FixedSizeList as List } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { GridContainer, LightBox, HomeTitle } from './wrappers';
+import { GridContainer, LightBox, HomeTitle, ToggleButton } from './wrappers';
 
 export const Home = () => {
   const lights = useSelector((state) => state.light.lights || []);
@@ -20,9 +20,18 @@ export const Home = () => {
     navigate(`/plantbox/${index + 1}`);
   };
 
+  const handleToggleAll = () => {
+    lights.forEach((light) => {
+      dispatch(toggleLightState(light.ip));
+    });
+  };
+
   return (
     <GridContainer>
       <HomeTitle>Grow Lights</HomeTitle>
+      <ToggleButton onClick={handleToggleAll}>
+        Toggle All Lights
+      </ToggleButton>
       <InfiniteLoader
         isItemLoaded={isItemLoaded}
         itemCount={lights.length + 10}
@@ -44,6 +53,7 @@ export const Home = () => {
               return (
                 <LightBox
                   onClick={() => handleBoxClick(light, index)}
+                  style={style}
                 >
                   {light.name}
                 </LightBox>

@@ -25,18 +25,40 @@ export const LightBox = styled.div`
   margin: 0 auto;
   margin-bottom: 20px;
 
-   @media (min-width: 768px) {
+  @media (min-width: 768px) {
     width: 20vw;
     height: 20vh;
+  }
+
   &:hover {
     transform: translateY(-5px);
     background-color: #e6f7ff;
   }
-}
 `;
 
 export const HomeTitle = styled.h1`
   font-size: 2rem;
   color: #333;
   text-align: center;
+`;
+
+export const ToggleButton = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #45a049;
+  }
+
+  &:active {
+    background-color: #3d8b41;
+  }
 `;
