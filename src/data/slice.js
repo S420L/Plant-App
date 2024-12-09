@@ -85,16 +85,22 @@ export const lightSlice = createSlice({
       state.currentLight = action.payload;
     },
     toggleLightState: (state, action) => {
-      const light = state.lights.find((l) => l.ip === action.payload);
-      if (light) {
-        light.isOn = !light.isOn;
-      }
+        console.log(`toggling all lights`);
     },
     updateCurrentLightState: (state) => {
       state.currentLight.isOn = !state.currentLight.isOn;
       const light = state.lights.find((l) => l.ip === state.currentLight.ip);
       if (light) {
+        console.log("toggling current light");
         light.isOn = state.currentLight.isOn;
+      }
+    },
+    updateLightState: (state, action) => {
+      const { ip, isOn } = action.payload;
+      const light = state.lights.find((l) => l.ip === ip);
+      console.log(`updating state of light ${ip}`);
+      if (light) {
+        light.isOn = isOn;
       }
     },
     updateLightTimers: (state, action) => {
@@ -122,6 +128,7 @@ export const {
   updateCurrentLightState,
   updateLightTimers,
   apiCallSuccess,
+  updateLightState
 } = lightSlice.actions;
 
 export const lightReducer = lightSlice.reducer;

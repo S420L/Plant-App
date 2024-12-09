@@ -21,9 +21,7 @@ export const Home = () => {
   };
 
   const handleToggleAll = () => {
-    lights.forEach((light) => {
-      dispatch(toggleLightState(light.ip));
-    });
+      dispatch(toggleLightState());
   };
 
   return (

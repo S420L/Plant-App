@@ -1,6 +1,6 @@
 import { takeLatest, put, call, select } from 'redux-saga/effects';
 import axios from 'axios';
-import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState } from './slice';
+import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, updateLightState } from './slice';
 
 // Selector to get the current light from the state
 const selectCurrentLight = (state) => state.light.currentLight;
@@ -8,6 +8,7 @@ const selectCurrentLight = (state) => state.light.currentLight;
 // Handle toggling the light ON/OFF
 function* handleToggleBox() {
   try {
+    console.log("toggling current light");
     const { ip, isOn } = yield select(selectCurrentLight);
     const url = `http://${ip}/led/${isOn ? 'on' : 'off'}`;
     const response = yield call(axios.get, url);
@@ -24,23 +25,26 @@ function* handleToggleBoxes() {
 
     // Determine the majority state (on or off)
     const onCount = lights.filter((light) => light.isOn).length;
+    console.log(lights);
+    console.log(onCount);
     const majorityState = onCount >= lights.length / 2; // True if majority are ON
-
+    console.log(majorityState);
+    console.log(`TARGET STATE: ${majorityState ? 'off' : 'on'}`);
     // Target state for all lights
     const targetState = majorityState ? 'off' : 'on';
-
+    
     // Toggle all lights to the target state
-    for (const light of lights) {
+    let url_list = [];
+    for (let i = 0; i < lights.length; i++) {
+      let light = lights[i];
+    
       const url = `http://${light.ip}/led/${targetState}`;
-      try {
-        const response = yield call(axios.get, url);
-
-        // Dispatch success for each toggled light (optional)
-        yield put(apiCallSuccess({ ip: light.ip, data: response.data }));
-      } catch (error) {
-        console.error(`Failed to toggle light at IP: ${light.ip}`, error);
-      }
+      console.log(`Calling ${url}`);
+      url_list.push(url);
+      yield put(updateLightState({"ip": light.ip, "isOn": !majorityState}));
     }
+     yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': url_list});
+    
   } catch (error) {
     console.error('Error during toggle operation:', error);
   }
