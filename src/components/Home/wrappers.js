@@ -16,7 +16,7 @@ export const LightBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ffffff;
+  background-color: ${(props) => (props.isOn ? '#d4ffd4' : '#ffd4d4')};
   border: 2px solid #ccc;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -43,22 +43,34 @@ export const HomeTitle = styled.h1`
 `;
 
 export const ToggleButton = styled.button`
-  background-color: #4caf50;
-  color: white;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+  background-color: ${props => (props.toggleIsOn ? "#4caf50" : "#ccc")};
   border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: bold;
+  border-radius: 15px;
+  position: relative;
   cursor: pointer;
-  margin-bottom: 20px;
   transition: background-color 0.3s;
 
-  &:hover {
-    background-color: #45a049;
+  &::before {
+    content: "";
+    width: 24px;
+    height: 24px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: ${props => (props.toggleIsOn ? "calc(100% - 27px)" : "3px")};
+    transition: left 0.3s;
   }
 
-  &:active {
-    background-color: #3d8b41;
+  &:hover {
+    background-color: ${props => (props.toggleIsOn ? "#45a049" : "#bbb")};
+  }
+
+  &:active::before {
+    width: 26px;
+    height: 26px;
   }
 `;

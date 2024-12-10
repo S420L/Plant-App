@@ -96,7 +96,7 @@ export const PlantBox = () => {
   };
 
   return (
-    <Box>
+    <Box isOn={currentLight.isOn}>
       <h2>{currentLight.name || 'Unknown Light'}</h2>
       <FieldGroup>
         <FieldTitle>IP Address</FieldTitle>

@@ -11,7 +11,7 @@ function* handleToggleBox() {
     console.log("toggling current light");
     const { ip, isOn } = yield select(selectCurrentLight);
     const url = `http://${ip}/led/${isOn ? 'on' : 'off'}`;
-    const response = yield call(axios.get, url);
+    const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': [url]});
     yield put(apiCallSuccess(response.data));
   } catch (error) {
     console.error('Toggle API call failed:', error);
@@ -58,8 +58,8 @@ function* handleTimerChange(action) {
     const { ip, timeOn, timeOff } = action.payload;
 
     if (timeOn !== undefined && timeOff !== undefined) {
-      const url = `http://${ip}/timer?time_on=${timeOn}&time_off=${timeOff}`;
-      const response = yield call(axios.get, url);
+      const ip = `http://${ip}/timer?time_on=${timeOn}&time_off=${timeOff}`;
+      const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': [ip]});
       yield put(apiCallSuccess(response.data));
     }
   } catch (error) {
@@ -73,8 +73,8 @@ function* handleTimeRangeChange(action) {
     const { ip, startTime, endTime } = action.payload;
 
     if (startTime !== undefined && endTime !== undefined) {
-      const url = `http://${ip}/timerange?start=${startTime}&end=${endTime}`;
-      const response = yield call(axios.get, url);
+      const ip = `http://${ip}/timerange?start=${startTime}&end=${endTime}`;
+      const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': [ip]});
       yield put(apiCallSuccess(response.data));
     }
   } catch (error) {

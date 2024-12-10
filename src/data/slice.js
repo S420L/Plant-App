@@ -75,6 +75,7 @@ const initialState = {
     startTime: 0,
     endTime: 0,
   },
+  toggleIsOn: false,
 };
 
 export const lightSlice = createSlice({
@@ -86,6 +87,9 @@ export const lightSlice = createSlice({
     },
     toggleLightState: (state, action) => {
         console.log(`toggling all lights`);
+    },
+    setToggleIsOn: (state, action) => {
+      state.toggleIsOn = !state.toggleIsOn;
     },
     updateCurrentLightState: (state) => {
       state.currentLight.isOn = !state.currentLight.isOn;
@@ -128,7 +132,8 @@ export const {
   updateCurrentLightState,
   updateLightTimers,
   apiCallSuccess,
-  updateLightState
+  updateLightState,
+  setToggleIsOn,
 } = lightSlice.actions;
 
 export const lightReducer = lightSlice.reducer;

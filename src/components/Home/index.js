@@ -1,13 +1,14 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setCurrentLight, toggleLightState } from '../../data/slice';
+import { setCurrentLight, toggleLightState, setToggleIsOn } from '../../data/slice';
 import { FixedSizeList as List } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { GridContainer, LightBox, HomeTitle, ToggleButton } from './wrappers';
 
 export const Home = () => {
   const lights = useSelector((state) => state.light.lights || []);
+  const toggleIsOn = useSelector((state) => state.light.toggleIsOn);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -22,13 +23,13 @@ export const Home = () => {
 
   const handleToggleAll = () => {
       dispatch(toggleLightState());
+      dispatch(setToggleIsOn());
   };
 
   return (
     <GridContainer>
       <HomeTitle>Grow Lights</HomeTitle>
-      <ToggleButton onClick={handleToggleAll}>
-        Toggle All Lights
+      <ToggleButton onClick={handleToggleAll} toggleIsOn={toggleIsOn}>
       </ToggleButton>
       <InfiniteLoader
         isItemLoaded={isItemLoaded}
@@ -52,6 +53,7 @@ export const Home = () => {
                 <LightBox
                   onClick={() => handleBoxClick(light, index)}
                   style={style}
+                  isOn={light.isOn}
                 >
                   {light.name}
                 </LightBox>
