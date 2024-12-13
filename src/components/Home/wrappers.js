@@ -4,15 +4,20 @@ export const GridContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  width: 60vw;
+  padding: 10px 20px;
+  width: 69vw;
   background-color: #f9f9f9;
-  box-sizing: border-box;
+  height: calc(100vh - 20px); /* Full screen minus padding */
+  overflow: hidden; /* Ensure no unintended scrolling */
+`;
+
+export const LightBoxWrapper = styled.div`
+  padding-bottom: 20px; /* Space between items */
 `;
 
 export const LightBox = styled.div`
-  width: 69vw;
-  height: 20vh;
+  width: 250px; // Fixed width for stability
+  height: 160px; // Matches itemSize
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,7 +28,6 @@ export const LightBox = styled.div`
   cursor: pointer;
   transition: transform 0.2s, background-color 0.3s;
   margin: 0 auto;
-  margin-bottom: 20px;
 
   @media (min-width: 768px) {
     width: 20vw;
@@ -37,31 +41,32 @@ export const LightBox = styled.div`
 `;
 
 export const HomeTitle = styled.h1`
-  font-size: 2rem;
+  font-size: 1.5rem; /* Reduced font size */
   color: #333;
   text-align: center;
+  margin-bottom: 10px; /* Reduced margin */
 `;
 
 export const ToggleButton = styled.button`
   display: inline-block;
-  width: 60px;
-  height: 30px;
+  width: 50px; /* Reduced width */
+  height: 25px; /* Reduced height */
   background-color: ${props => (props.toggleIsOn ? "#4caf50" : "#ccc")};
   border: none;
-  border-radius: 15px;
+  border-radius: 12px; /* Smaller border-radius */
   position: relative;
   cursor: pointer;
   transition: background-color 0.3s;
 
   &::before {
     content: "";
-    width: 24px;
-    height: 24px;
+    width: 20px; /* Reduced circle size */
+    height: 20px;
     background-color: white;
     border-radius: 50%;
     position: absolute;
-    top: 3px;
-    left: ${props => (props.toggleIsOn ? "calc(100% - 27px)" : "3px")};
+    top: 2.5px; /* Adjusted alignment */
+    left: ${props => (props.toggleIsOn ? "calc(100% - 23px)" : "2.5px")};
     transition: left 0.3s;
   }
 
@@ -70,7 +75,45 @@ export const ToggleButton = styled.button`
   }
 
   &:active::before {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
   }
 `;
+
+export const SettingsButton = styled.button`
+  display: inline-block;
+  width: auto;
+  padding: 6px 12px; /* Further reduced size */
+  margin-top: 10px; /* Reduced top margin */
+  margin-bottom: 15px; /* Adjusted spacing */
+  background-color: #4caf50;
+  color: white;
+  font-size: 12px; /* Further reduced font size */
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.2s;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    background-color: #3d8b41;
+    transform: translateY(1px);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 3px #4caf50;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    font-size: 10px; /* Smaller font size for mobile */
+  }
+`;
+

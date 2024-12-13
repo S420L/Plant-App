@@ -1,6 +1,6 @@
 import { takeLatest, put, call, select } from 'redux-saga/effects';
 import axios from 'axios';
-import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, updateLightState } from './slice';
+import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, updateLightState, setLightsState  } from './slice';
 
 // Selector to get the current light from the state
 const selectCurrentLight = (state) => state.light.currentLight;
@@ -17,6 +17,33 @@ function* handleToggleBox() {
     console.error('Toggle API call failed:', error);
   }
 }
+
+function* fetchPinStates() {
+  try {
+    const lights = yield select((state) => state.light.lights);
+
+    // Iterate over each light and handle responses individually
+    for (const light of lights) {
+      try {
+        const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {
+          ip: [`http://${light.ip}/pin/status`],
+        });
+        console.log(response.data);
+        const isOn = response.data[0].response.includes('LOW'); // Parse "LOW" (ON) from the response
+
+        // Dispatch an action to update the state of the specific light
+        yield put(updateLightState({ ip: light.ip, isOn }));
+      } catch (error) {
+          console.log(`Failed to fetch state for ${light.name}:`, error);
+          yield put(updateLightState({ ip: light.ip, isOn: false })); // Default "OFF" for true errors
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching pin states:', error);
+  }
+}
+
+
 
 function* handleToggleBoxes() {
   try {
@@ -54,28 +81,86 @@ function* handleToggleBoxes() {
 
 // Handle updating the timer (timeOn and timeOff)
 function* handleTimerChange(action) {
+  // Skip self-triggered actions
+  if (action.meta?.selfDispatched) {
+    console.log('Skipping self-triggered timer change...');
+    return;
+  }
+  console.log("HERE AGAIN!!");
   try {
-    const { ip, timeOn, timeOff } = action.payload;
-
-    if (timeOn !== undefined && timeOff !== undefined) {
-      const ip = `http://${ip}/timer?time_on=${timeOn}&time_off=${timeOff}`;
-      const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': [ip]});
-      yield put(apiCallSuccess(response.data));
+    console.log("HERE first!!");
+    const { ip, timeOn, timeOff, startTime, endTime } = action.payload;
+    console.log("_____________");
+    console.log(ip);
+    console.log(startTime);
+    console.log(endTime);
+    console.log(timeOn);
+    console.log(timeOff);
+    console.log("===============");
+    if(timeOn !== undefined && timeOff !== undefined){
+      if (!ip) {
+        var url_list = [];
+        // Master settings: Apply to all lights
+        const lights = yield select((state) => state.light.lights);
+        for (const light of lights) {
+          url_list.push(`http://${light.ip}/timer?time_on=${timeOn}&time_off=${timeOff}`);
+        }
+        yield call(axios.post, 'https://S420L.club/api/toggle_lights', { ip: url_list });
+        yield put({
+          type: updateLightTimers.type,
+          payload: { timeOn, timeOff },
+          meta: { selfDispatched: true },
+        });
+      } else {
+        // Individual light settings
+        const url = `http://${ip}/timer?time_on=${timeOn}&time_off=${timeOff}`;
+        const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', { ip: [url] });
+        yield put(apiCallSuccess(response.data));
+      }
     }
   } catch (error) {
     console.error('Timer API call failed:', error);
   }
 }
 
+
 // Handle updating the time range (startTime and endTime)
 function* handleTimeRangeChange(action) {
+  console.log("HERE AGAIN!!");
+  if (action.meta?.selfDispatched) {
+    console.log('Skipping self-triggered timer change...');
+    return;
+  }
   try {
+    console.log("HERE first!!");
     const { ip, startTime, endTime } = action.payload;
-
-    if (startTime !== undefined && endTime !== undefined) {
-      const ip = `http://${ip}/timerange?start=${startTime}&end=${endTime}`;
-      const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': [ip]});
-      yield put(apiCallSuccess(response.data));
+    console.log("_____________");
+    console.log(ip);
+    console.log(startTime);
+    console.log(endTime);
+    if(startTime !== undefined && endTime !== undefined){
+      console.log("HERE AGAIN!!");
+      if (!ip) {
+        var url_list = [];
+        console.log("HERE first!!");
+        // Master settings: Apply time range to all lights
+        const lights = yield select((state) => state.light.lights);
+        for (const light of lights) {
+          url_list.push(`http://${light.ip}/timerange?start=${startTime}&end=${endTime}`);
+        }
+        yield call(axios.post, 'https://S420L.club/api/toggle_lights', { ip: url_list });
+        // Update masterLightBox and all lights in Redux state
+        yield put({
+          type: updateLightTimers.type,
+          payload: { startTime, endTime },
+          meta: { selfDispatched: true },
+        });
+      } else {
+        // Individual light settings
+        const url = `http://${ip}/timerange?start=${startTime}&end=${endTime}`;
+        const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', { ip: [url] });
+        yield put(apiCallSuccess(response.data));
+      }
     }
   } catch (error) {
     console.error('Time Range API call failed:', error);
@@ -84,6 +169,7 @@ function* handleTimeRangeChange(action) {
 
 // Root Saga to handle all relevant actions
 export default function* rootSaga() {
+  yield takeLatest('APP/INIT_FETCH_PIN_STATES', fetchPinStates);
   yield takeLatest(updateCurrentLightState.type, handleToggleBox);
   yield takeLatest(toggleLightState.type, handleToggleBoxes);
 

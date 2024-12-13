@@ -1,6 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+  masterLightBox: {
+    name: 'Settings for all',
+    timeOn: 0,
+    timeOff: 0,
+    startTime: 0,
+    endTime: 0,
+  },
   lights: [
     {
       name: '420',
@@ -85,6 +92,13 @@ export const lightSlice = createSlice({
     setCurrentLight: (state, action) => {
       state.currentLight = action.payload;
     },
+    setLightsState: (state, action) => {
+      const updatedLights = action.payload;
+      state.lights = state.lights.map((light) => {
+        const updatedLight = updatedLights.find((l) => l.ip === light.ip);
+        return updatedLight ? { ...light, isOn: updatedLight.isOn } : light;
+      });
+    },
     toggleLightState: (state, action) => {
         console.log(`toggling all lights`);
     },
@@ -109,15 +123,23 @@ export const lightSlice = createSlice({
     },
     updateLightTimers: (state, action) => {
       const { ip, timeOn, timeOff, startTime, endTime } = action.payload;
-      const light = state.lights.find((l) => l.ip === ip);
-      if (light) {
-        light.timeOn = timeOn ?? light.timeOn;
-        light.timeOff = timeOff ?? light.timeOff;
-        light.startTime = startTime ?? light.startTime;
-        light.endTime = endTime ?? light.endTime;
-      }
-      if (state.currentLight.ip === ip) {
-        state.currentLight = { ...state.currentLight, timeOn, timeOff, startTime, endTime };
+      if (!ip) {
+        // Update all lights when `ip` is missing (master settings)
+        state.lights.forEach((light) => {
+          light.timeOn = timeOn ?? light.timeOn;
+          light.timeOff = timeOff ?? light.timeOff;
+          light.startTime = startTime ?? light.startTime;
+          light.endTime = endTime ?? light.endTime;
+        });
+        state.masterLightBox = { name: 'Settings for all', timeOn, timeOff, startTime, endTime };
+      } else {
+        const light = state.lights.find((l) => l.ip === ip);
+        if (light) {
+          light.timeOn = timeOn ?? light.timeOn;
+          light.timeOff = timeOff ?? light.timeOff;
+          light.startTime = startTime ?? light.startTime;
+          light.endTime = endTime ?? light.endTime;
+        }
       }
     },
     apiCallSuccess: (state, action) => {
@@ -134,6 +156,7 @@ export const {
   apiCallSuccess,
   updateLightState,
   setToggleIsOn,
+  setLightsState
 } = lightSlice.actions;
 
 export const lightReducer = lightSlice.reducer;

@@ -1,9 +1,9 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
 import { Home } from './components/Home';
 import { PlantBox } from './components/PlantBox';
 import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,7 +23,10 @@ const Wrapper = styled.div`
 `;
 
 export const App = () => {
-  const lights = useSelector((state) => state.light.lights || []);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch({ type: 'APP/INIT_FETCH_PIN_STATES' }); // Trigger fetching pin states on app load
+  }, [dispatch]);
 
   return (
     <Router>

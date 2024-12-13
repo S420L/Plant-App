@@ -30,7 +30,7 @@ export const PlantBox = () => {
     const lightIndex = parseInt(id, 10) - 1; // Convert ID to zero-based index
     const light = lights[lightIndex];
 
-    if (light) {
+    if (light || id === "master") {
       dispatch(setCurrentLight(light));
     } else {
       console.warn('Invalid light ID. Redirecting to home.');
@@ -38,7 +38,9 @@ export const PlantBox = () => {
     }
   }, [id, lights, dispatch, navigate]);
 
-  const currentLight = useSelector((state) => state.light.currentLight);
+  const currentLight = useSelector((state) =>
+    id === 'master' ? state.light.masterLightBox : state.light.currentLight
+  );
 
   if (!currentLight.name) {
     return <p>Loading...</p>; // Show loading state if currentLight isn't set
@@ -95,6 +97,48 @@ export const PlantBox = () => {
     dispatch(updateCurrentLightState());
   };
 
+  if (id === 'master') {
+    const handleMasterSubmit = () => {
+      handleSubmit();
+      navigate('/');
+    };
+  return (
+    <Box>
+      <h2>Settings for all</h2>
+      <FieldGroup>
+        <FieldTitle>Cycle</FieldTitle>
+        <InputField
+          type="number"
+          value={localTimeOn}
+          onChange={(e) => setLocalTimeOn(e.target.value)}
+          placeholder="Time On"
+        />
+        <InputField
+          type="number"
+          value={localTimeOff}
+          onChange={(e) => setLocalTimeOff(e.target.value)}
+          placeholder="Time Off"
+        />
+      </FieldGroup>
+      <FieldGroup>
+        <FieldTitle>Time Range</FieldTitle>
+        <InputField
+          type="number"
+          value={localStartTime}
+          onChange={(e) => setLocalStartTime(e.target.value)}
+          placeholder="Start Time"
+        />
+        <InputField
+          type="number"
+          value={localEndTime}
+          onChange={(e) => setLocalEndTime(e.target.value)}
+          placeholder="End Time"
+        />
+      </FieldGroup>
+      <SubmitButton onClick={handleMasterSubmit}>Submit</SubmitButton>
+    </Box>
+  );
+} else {
   return (
     <Box isOn={currentLight.isOn}>
       <h2>{currentLight.name || 'Unknown Light'}</h2>
@@ -143,4 +187,5 @@ export const PlantBox = () => {
       <SubmitButton onClick={handleSubmit}>Submit</SubmitButton>
     </Box>
   );
+}
 };
