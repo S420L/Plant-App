@@ -160,3 +160,58 @@ export const SubmitButton = styled.button`
     font-size: 16px;
   }
 `;
+
+export const BackButton = styled.button`
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  padding: 2px 7px;
+  background-color: #007bff;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid black;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  background: linear-gradient(to right, #5F9EA0 15px, #87CEEB 100%);
+  clip-path: polygon(15px 0, 100% 0, 100% 100%, 15px 100%, 0 50%);
+  position: absolute;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    margin-right: 8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 12px solid white; /* Arrow color, consistent size */
+  }
+
+  /* Top slanted line */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 45%; /* Align with the top slant */
+    left: 0;
+    width: 22px; /* Length of the line */
+    height: 2px; /* Thickness of the line */
+    background-color: black;
+    transform-origin: 0 50%;
+    transform: rotate(-37deg); /* Slant direction */
+  }
+
+  .bottom-line {
+    position: absolute;
+    top: 45%; /* Align for the bottom slant */
+    left: 0;
+    width: 22px; /* Length of the line */
+    height: 2px; /* Thickness of the line */
+    background-color: black;
+    transform-origin: 0 50%;
+    transform: rotate(37deg); /* Slant direction reversed */
+  }
+`;

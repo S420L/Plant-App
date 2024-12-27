@@ -1,21 +1,64 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentLight, toggleLightState, setToggleIsOn } from '../../data/slice';
-import { FixedSizeList as List } from 'react-window';
-import InfiniteLoader from 'react-window-infinite-loader';
-import { GridContainer, LightBox, HomeTitle, ToggleButton, SettingsButton, LightBoxWrapper } from './wrappers';
+import {
+  GridContainer,
+  LightBox,
+  HomeTitle,
+  ToggleButton,
+  SettingsButton,
+  ButtonContainer,
+  LightBoxWrapper,
+} from './wrappers';
 
 export const Home = () => {
-  const lights = useSelector((state) => state.light.lights || []);
-  const areMajorityLightsOn = lights.filter((light) => light.isOn).length >= lights.length / 2;
-  const toggleIsOn = useSelector((state) => state.light.toggleIsOn);
+  const allLights = useSelector((state) => state.light.lights || []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isItemLoaded = (index) => index < lights.length;
-  const loadMoreItems = () => {};
+  const [visibleLights, setVisibleLights] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 6;
+  const gridRef = useRef(null);
 
+  const loadMoreLights = useCallback(() => {
+    const nextPage = currentPage + 1;
+    const newLights = allLights.slice(
+      nextPage * itemsPerPage,
+      (nextPage + 1) * itemsPerPage
+    );
+
+    if (newLights.length > 0) {
+      setVisibleLights((prev) => [...prev, ...newLights]);
+      setCurrentPage(nextPage);
+    }
+  }, [allLights, currentPage]);
+
+  // Initial load
+  useEffect(() => {
+    if (allLights.length > 0) {
+      setVisibleLights(allLights.slice(0, itemsPerPage));
+    }
+  }, [allLights]); // Removed `visibleLights` to ensure updates on `allLights` changes
+
+  // Scroll detection
+  const handleScroll = useCallback(() => {
+    if (!gridRef.current) return;
+
+    const { scrollTop, clientHeight, scrollHeight } = gridRef.current;
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      loadMoreLights();
+    }
+  }, [loadMoreLights]);
+
+  useEffect(() => {
+    const gridElement = gridRef.current;
+    if (gridElement) {
+      gridElement.addEventListener('scroll', handleScroll);
+      return () => gridElement.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
 
   const handleBoxClick = (light, index) => {
     dispatch(setCurrentLight(light));
@@ -23,56 +66,37 @@ export const Home = () => {
   };
 
   const handleToggleAll = () => {
-      dispatch(toggleLightState());
-      dispatch(setToggleIsOn());
+    dispatch(toggleLightState());
+    dispatch(setToggleIsOn());
   };
 
   const handleSettingsAllClick = () => {
     navigate('/plantbox/master');
   };
-  
+
   return (
-    <GridContainer>
+    <GridContainer ref={gridRef}>
       <HomeTitle>Grow Lights</HomeTitle>
-      <ToggleButton onClick={handleToggleAll} toggleIsOn={areMajorityLightsOn}></ToggleButton>
-      <SettingsButton onClick={handleSettingsAllClick}>Settings (all)</SettingsButton>
-      <InfiniteLoader
-        isItemLoaded={isItemLoaded}
-        itemCount={lights.length}
-        loadMoreItems={loadMoreItems}
-      >
-        {({ onItemsRendered, ref }) => (
-          <List
-          height={window.innerHeight}
-          itemCount={lights.length}
-          itemSize={160}
-          onItemsRendered={({ overscanStartIndex, overscanStopIndex, visibleStartIndex, visibleStopIndex }) => {
-            console.log(`Visible: ${visibleStartIndex} to ${visibleStopIndex}`);
-            console.log(`Overscan: ${overscanStartIndex} to ${overscanStopIndex}`);
-            onItemsRendered({ overscanStartIndex, overscanStopIndex, visibleStartIndex, visibleStopIndex });
-          }}
-          ref={ref}
-          itemKey={(index) => lights[index]?.id || index}
-        >
-          {({ index, style }) => {
-            const light = lights[index];
-            if (!light) return null;
-        
-            return (
-              <LightBoxWrapper>
-                <LightBox
-                  onClick={() => handleBoxClick(light, index)}
-                  isOn={light.isOn}
-                >
-                  {light.name}
-                </LightBox>
-              </LightBoxWrapper>
-            );
-          }}
-        </List>
-        
-        )}
-      </InfiniteLoader>
+      <ButtonContainer>
+        <ToggleButton
+          onClick={handleToggleAll}
+          toggleIsOn={
+            allLights.filter((light) => light.isOn).length > allLights.length / 2
+          }
+        />
+        <SettingsButton onClick={handleSettingsAllClick}>
+          Settings (all)
+        </SettingsButton>
+      </ButtonContainer>
+      <div>
+        {visibleLights.map((light, index) => (
+          <LightBoxWrapper key={light.id}>
+            <LightBox onClick={() => handleBoxClick(light, index)} isOn={light.isOn}>
+              {light.name || 'Untitled'}
+            </LightBox>
+          </LightBoxWrapper>
+        ))}
+      </div>
     </GridContainer>
   );
 };

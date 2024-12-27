@@ -10,7 +10,7 @@ const initialState = {
   },
   lights: [
     {
-      name: '420',
+      name: 'white light 69',
       ip: '192.168.0.144',
       isOn: false,
       timeOn: 0,
@@ -19,7 +19,7 @@ const initialState = {
       endTime: 0,
     },
     {
-      name: 'light 2',
+      name: 'purp light 69',
       ip: '192.168.0.150',
       isOn: false,
       timeOn: 0,
@@ -28,7 +28,7 @@ const initialState = {
       endTime: 0,
     },
     {
-      name: 'light 3',
+      name: 'left light 420',
       ip: '192.168.0.108',
       isOn: false,
       timeOn: 0,
@@ -37,7 +37,7 @@ const initialState = {
       endTime: 0,
     },
     {
-      name: 'light 69',
+      name: 'idk',
       ip: '192.168.0.196',
       isOn: false,
       timeOn: 0,
@@ -46,7 +46,7 @@ const initialState = {
       endTime: 0,
     },
     {
-      name: 'light 69420',
+      name: 'lemon tree light',
       ip: '192.168.0.156',
       isOn: false,
       timeOn: 0,
@@ -55,7 +55,7 @@ const initialState = {
       endTime: 0,
     },
     {
-      name: 'light 4',
+      name: 'white light 69',
       ip: '192.168.0.185',
       isOn: false,
       timeOn: 0,
@@ -64,8 +64,17 @@ const initialState = {
       endTime: 0,
     },
     {
-      name: 'light 6',
+      name: 'right light 420',
       ip: '192.168.0.186',
+      isOn: false,
+      timeOn: 0,
+      timeOff: 0,
+      startTime: 0,
+      endTime: 0,
+    },
+    {
+      name: '4 lights in the small stand',
+      ip: '192.168.0.141',
       isOn: false,
       timeOn: 0,
       timeOff: 0,
