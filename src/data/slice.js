@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   masterLightBox: {
-    name: 'Settings for all',
+    name: 'change settings (all)',
     timeOn: 0,
     timeOff: 0,
     startTime: 0,
@@ -37,7 +37,7 @@ const initialState = {
       endTime: 0,
     },
     {
-      name: 'idk',
+      name: 'white light 69',
       ip: '192.168.0.196',
       isOn: false,
       timeOn: 0,
@@ -55,7 +55,7 @@ const initialState = {
       endTime: 0,
     },
     {
-      name: 'white light 69',
+      name: 'viewing light',
       ip: '192.168.0.185',
       isOn: false,
       timeOn: 0,
@@ -81,6 +81,15 @@ const initialState = {
       startTime: 0,
       endTime: 0,
     },
+    {
+      name: 'viewing light',
+      ip: '192.168.0.137',
+      isOn: false,
+      timeOn: 0,
+      timeOff: 0,
+      startTime: 0,
+      endTime: 0,
+    },
   ],
   currentLight: {
     name: '',
@@ -92,6 +101,7 @@ const initialState = {
     endTime: 0,
   },
   toggleIsOn: false,
+  viewingIsOn: false,
 };
 
 export const lightSlice = createSlice({
@@ -113,6 +123,12 @@ export const lightSlice = createSlice({
     },
     setToggleIsOn: (state, action) => {
       state.toggleIsOn = !state.toggleIsOn;
+    },
+    toggleViewingState: (state, action) => {
+      console.log(`toggling viewing lights`);
+  },
+    setViewingIsOn: (state, action) => {
+      state.viewingIsOn = !state.viewingIsOn;
     },
     updateCurrentLightState: (state) => {
       state.currentLight.isOn = !state.currentLight.isOn;
@@ -160,12 +176,14 @@ export const lightSlice = createSlice({
 export const {
   setCurrentLight,
   toggleLightState,
+  toggleViewingState,
   updateCurrentLightState,
   updateLightTimers,
   apiCallSuccess,
   updateLightState,
   setToggleIsOn,
-  setLightsState
+  setLightsState,
+  setViewingIsOn
 } = lightSlice.actions;
 
 export const lightReducer = lightSlice.reducer;

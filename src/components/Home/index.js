@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setCurrentLight, toggleLightState, setToggleIsOn } from '../../data/slice';
+import { setCurrentLight, toggleLightState, setToggleIsOn, setViewingIsOn, toggleViewingState } from '../../data/slice';
 import {
   GridContainer,
   LightBox,
   HomeTitle,
   ToggleButton,
   SettingsButton,
+  ViewingModeButton, // Add new styled button
   ButtonContainer,
   LightBoxWrapper,
 } from './wrappers';
@@ -40,7 +41,7 @@ export const Home = () => {
     if (allLights.length > 0) {
       setVisibleLights(allLights.slice(0, itemsPerPage));
     }
-  }, [allLights]); // Removed `visibleLights` to ensure updates on `allLights` changes
+  }, [allLights]);
 
   // Scroll detection
   const handleScroll = useCallback(() => {
@@ -74,20 +75,34 @@ export const Home = () => {
     navigate('/plantbox/master');
   };
 
+  const handleViewingMode = () => {
+    dispatch(toggleViewingState());
+    dispatch(setViewingIsOn());
+  };
+
   return (
-    <GridContainer ref={gridRef}>
-      <HomeTitle>Grow Lights</HomeTitle>
-      <ButtonContainer>
+    <div>
+    <ButtonContainer>
+        ON/OFF switch (all)
         <ToggleButton
           onClick={handleToggleAll}
           toggleIsOn={
             allLights.filter((light) => light.isOn).length > allLights.length / 2
           }
         />
+        Viewing Mode
+        <ViewingModeButton
+          onClick={handleViewingMode}
+          viewingIsOn={
+            allLights.filter((light) => light.ip==="192.168.0.137")[0].isOn
+          }
+        />
         <SettingsButton onClick={handleSettingsAllClick}>
           Settings (all)
         </SettingsButton>
       </ButtonContainer>
+    <GridContainer ref={gridRef}>
+      
       <div>
         {visibleLights.map((light, index) => (
           <LightBoxWrapper key={light.id}>
@@ -98,5 +113,6 @@ export const Home = () => {
         ))}
       </div>
     </GridContainer>
+    </div>
   );
 };

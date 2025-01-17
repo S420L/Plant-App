@@ -8,7 +8,7 @@ export const GridContainer = styled.div`
   width: 100%; /* Ensures full width for responsiveness */
   max-width: 1200px; /* Optional: Limit max width for larger screens */
   background-color: #f9f9f9;
-  height: 100vh; /* Full screen height */
+  height: 69vh; /* Full screen height */
   overflow-y: auto; /* Enable scrolling for dynamic content */
   overflow-x: hidden; /* Prevent horizontal scrolling */
   box-sizing: border-box;
@@ -137,5 +137,39 @@ export const SettingsButton = styled.button`
   @media (max-width: 768px) {
     width: 100%;
     font-size: 10px;
+  }
+`;
+
+export const ViewingModeButton = styled.button`
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+  background-color: ${(props) => (props.viewingIsOn ? '#4caf50' : '#ccc')};
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: relative; /* Needed for proper alignment of the pseudo-element */
+  overflow: hidden; /* Ensures the pseudo-element doesn't extend outside the button */
+
+  &::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute; /* Aligns relative to the button */
+    top: 2.5px; /* Centers vertically within the button */
+    left: ${(props) => (props.viewingIsOn ? 'calc(100% - 23px)' : '2.5px')}; /* Toggles position */
+    transition: left 0.3s;
+  }
+
+  &:hover {
+    background-color: ${(props) => (props.viewingIsOn ? '#45a049' : '#bbb')};
+  }
+
+  &:active::before {
+    width: 22px;
+    height: 22px;
   }
 `;

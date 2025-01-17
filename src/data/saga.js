@@ -1,6 +1,6 @@
 import { takeLatest, put, call, select } from 'redux-saga/effects';
 import axios from 'axios';
-import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, updateLightState, setLightsState  } from './slice';
+import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, toggleViewingState, updateLightState, setLightsState  } from './slice';
 
 // Selector to get the current light from the state
 const selectCurrentLight = (state) => state.light.currentLight;
@@ -77,7 +77,56 @@ function* handleToggleBoxes() {
   }
 }
 
+function* handleViewingBoxes() {
+  try {
+    // Select all lights from the Redux state
+    const lights = yield select((state) => state.light.lights);
 
+    const viewingState = lights.filter((light) => light.ip === "192.168.0.137")[0].isOn;
+    console.log(viewingState);
+    // Target state for all lights
+    const targetStateViewing = viewingState ? 'off' : 'on';
+    const targetStateNonViewing = viewingState ? 'on' : 'off';
+    console.log(`TARGET STATE VIEWING: ${targetStateViewing}`);
+    console.log(`TARGET STATE NON-VIEWING: ${targetStateNonViewing}`);
+    
+    let viewing_lights = [];
+    let non_viewing_lights = [];
+    if(viewingState){
+      viewing_lights = lights.filter((light) => light.name === "viewing light");
+      non_viewing_lights = lights.filter((light) => light.ip !== "192.168.0.137");
+    } else {
+      viewing_lights = lights.filter((light) => light.ip === "192.168.0.137");
+      non_viewing_lights = lights.filter((light) => light.name !== "viewing light");
+    }
+    
+    // Toggle all lights to the target state
+    
+      
+      let url_list = [];
+      for (let i = 0; i < viewing_lights.length; i++) {
+        let light = viewing_lights[i];
+        const url = `http://${light.ip}/led/${targetStateViewing}`;
+        console.log(`Calling ${url}`);
+        url_list.push(url);
+        yield put(updateLightState({"ip": light.ip, "isOn": !viewingState}));
+      }
+       yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': url_list});
+       url_list = [];
+
+    for (let i = 0; i < non_viewing_lights.length; i++) {
+      let light = non_viewing_lights[i];
+      const url = `http://${light.ip}/led/${targetStateNonViewing}`;
+      console.log(`Calling ${url}`);
+      url_list.push(url);
+      yield put(updateLightState({"ip": light.ip, "isOn": viewingState}));
+    }
+     yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': url_list});
+    
+  } catch (error) {
+    console.error('Error during toggle operation:', error);
+  }
+}
 
 // Handle updating the timer (timeOn and timeOff)
 function* handleTimerChange(action) {
@@ -172,6 +221,7 @@ export default function* rootSaga() {
   yield takeLatest('APP/INIT_FETCH_PIN_STATES', fetchPinStates);
   yield takeLatest(updateCurrentLightState.type, handleToggleBox);
   yield takeLatest(toggleLightState.type, handleToggleBoxes);
+  yield takeLatest(toggleViewingState.type, handleViewingBoxes);
 
   yield takeLatest(updateLightTimers.type, function* (action) {
     const { timeOn, timeOff, startTime, endTime } = action.payload;
