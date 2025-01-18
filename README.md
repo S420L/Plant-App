@@ -24,15 +24,15 @@ The JavaScript code in this repo is for an app to control the stand (progressive
   <tr>
     <td align="center">
       <strong>Basic interface</strong><br>
-      <img src="https://s420l.club/static/plantpix/basicdemogif.gif" width="200" alt="App Interface Demo">
+      <img src="./assets/basicdemogif.gif" width="200" alt="App Interface Demo">
     </td>
     <td align="center">
       <strong>Controlling the plant stand</strong><br>
-      <img src="https://s420l.club/static/plantpix/irldemo.gif" width="200" alt="Real-Life Plant Stand Demo">
+      <img src="./assets/irldemo.gif" width="200" alt="Real-Life Plant Stand Demo">
     </td>
     <td align="center">
       <strong>Custom circuits to hack the lights</strong><br>
-      <img src="https://s420l.club/static/plantpix/circuits.gif" width="200" alt="Real-Life Plant Stand Demo">
+      <img src="./assets/circuits.gif" width="200" alt="Real-Life Plant Stand Demo">
     </td>
   </tr>
 </table>
