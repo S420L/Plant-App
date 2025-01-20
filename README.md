@@ -23,16 +23,11 @@ The JavaScript code in this repo is for an app to control the stand (progressive
 <table>
   <tr>
     <td align="center">
-      <strong>Basic interface</strong><br>
-      <img src="./assets/basicdemogif.gif" width="200" alt="App Interface Demo">
-    </td>
-    <td align="center">
-      <strong>Controlling the plant stand</strong><br>
-      <img src="./assets/irldemo.gif" width="200" alt="Real-Life Plant Stand Demo">
-    </td>
-    <td align="center">
-      <strong>Custom circuits to hack the lights</strong><br>
-      <img src="./assets/circuits.gif" width="200" alt="Real-Life Plant Stand Demo">
+        <strong>Basic interface</strong><br>
+            <video autoplay loop muted playsinline width="400">
+                <source src="https://s420l.club/static/plantpix/circuitstest.mov" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
     </td>
   </tr>
 </table>
