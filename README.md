@@ -24,25 +24,16 @@ The JavaScript code in this repo is for an app to control the stand (progressive
 <table>
   <tr>
     <td align="center">
-        <strong>Basic interface</strong><br>
-        <video autoplay loop muted playsinline height="420">
-            <source src="./assets/basicdemo.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <strong>Basic interface</strong><br>
+    <img src="./assets/basicdemogif.gif" height="420">
     </td>
     <td align="center">
-        <strong>Controlling the plant stand</strong><br>
-        <video autoplay loop muted playsinline height="420">
-            <source src="./assets/irldemo.mov" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <strong>Live demo</strong><br>
+    <img src="./assets/irldemo.gif" height="420">
     </td>
     <td align="center">
-        <strong>Custom circuits to hack the lights</strong><br>
-        <video autoplay loop muted playsinline height="420">
-            <source src="./assets/circuits.mov" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <strong>Circuits</strong><br>
+    <img src="./assets/circuitdemo.gif" height="420">
     </td>
   </tr>
 </table>
