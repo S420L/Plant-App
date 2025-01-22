@@ -1,5 +1,5 @@
 # Plant Stand Project v5
-Decided to make this public to showcase my full stack engineering abilities. The commit messages won't make any sense as this is a solo project that I never intended to share--my apologies for that. Continue reading to see a description of the project and its motivation, app demo, and steps to create your own version.
+Decided to make this public to showcase my full stack engineering abilities. Sorry about the commit messages...continue reading to see a description of the project and its motivation, app demo, and steps to create your own version.
 
 ---
 # Background
@@ -10,14 +10,15 @@ Past version of the stand had features this one doesn't (yet) have; like advance
 The focus of this stand is to have an app on my phone giving me fine grained control over the lights from anywhere in the world. Oh...and also to be way bigger and more powerful (specs: 15 cubic feet, 400 watts).
 
 ## App Features
-- Installable on any device as a Progressive Web App
+- Progressive Web App that can be installed on any device
+- Infinite scroll displaying all your grow lights
 - On/off control for each individual light
 - Time range setting for each individual light (military time input, settings persist after restart)
 - Time cycle setting for each individual light (input in hours, settings are lost on restart)
 - Ability to set all of the above for all lights at once
 - Viewing mode toggle for stand (you specify weaker lights to be viewing lights as to not blind yourself)
 - Lights are colored red for OFF and green for ON (it directly reads data from microcontroller GPIO pins so you can be sure the state is accurate)
-- Ability to wirelessly update microcontrollers (as long as you don't change your network login settings...)
+- Ability to wirelessly update grow light circuits (as long as you don't change your network login settings...)
 
 ## Demo
 
@@ -38,7 +39,7 @@ The focus of this stand is to have an app on my phone giving me fine grained con
   </tr>
 </table>
 
-The JavaScript code in this repo is for an app to control the stand. C++ code is what I used to program ESP32 microcontrollers attached to each individual grow light. Python code is a stripped down version of what I have running on my proxy server. The C++ and Python code does not integrate directly with the React code and are totally separate pieces of the project I included for context. I also included the Dockerfile on my server as a starting point for anyone interested in trying to recreate.
+The JavaScript code in this repo is for an app to control the stand. C++ code is what I used to program ESP32 microcontrollers attached to each individual grow light. Python code is a stripped down version of what I have running on my server, I don't wanna make that code public and get ☠️hacked☠️. The C++, Python, and Docker code does not integrate directly with the React code and are separate pieces of the project I included for context.
 
 ---
 
@@ -66,8 +67,8 @@ You will need several things to recreate this project, much of which can't be in
 3) Connect circuits to grow lights (wiring will differ based on the type of lights you have--I have 4 different kinds, some with up to 15 individual connections)
 4) Test API manually using local IP addresses assigned to microcontrollers (you can find the IP it was assigned in Arduino app)
 5) Create on-prem server (I used Nginx running on Ubuntu server in VirtualBox running on a Windows 10 computer)
-6) Set up a public facing API on your on-prem server (you will also need to go into your router settings and set up some port forwarding rules)
-7) Clone React code (this repo), change my server URLs to reference your own, and test
+6) Set up a public facing API on your on-prem server (you will also need to go into your router settings and set up some port forwarding rules, and register a domain name)
+7) Clone React code (this repo), change my server URLs to reference your own, grow light IP addresses to match your own, and test
 8) Once it all works you can set up a server to host the React app (I used a clone of the Ubuntu/VirtualBox/Nginx and Docker)
 
 
