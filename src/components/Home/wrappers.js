@@ -140,6 +140,41 @@ export const SettingsButton = styled.button`
   }
 `;
 
+export const ManualReleaseButton = styled.button`
+  display: inline-block;
+  width: auto;
+  padding: 6px 12px;
+  background-color: ${(props) => (props.toggleManualOverride ? '#45a049' : '#bbb')};
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.2s;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    background-color: #3d8b41;
+    transform: translateY(1px);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 3px #4caf50;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    font-size: 10px;
+  }
+`;
+
 export const ViewingModeButton = styled.button`
   display: inline-block;
   width: 50px;

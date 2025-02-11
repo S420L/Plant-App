@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setCurrentLight, toggleLightState, setToggleIsOn, setViewingIsOn, toggleViewingState } from '../../data/slice';
+import { setCurrentLight, toggleLightState, setToggleIsOn, setViewingIsOn, toggleViewingState, setManualOverride, toggleManualRelease } from '../../data/slice';
 import {
   GridContainer,
   LightBox,
@@ -11,10 +11,12 @@ import {
   ViewingModeButton, // Add new styled button
   ButtonContainer,
   LightBoxWrapper,
+  ManualReleaseButton
 } from './wrappers';
 
 export const Home = () => {
   const allLights = useSelector((state) => state.light.lights || []);
+  const manualOverride = useSelector((state) => state.light.manualOverride || false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -70,6 +72,10 @@ export const Home = () => {
     dispatch(toggleLightState());
     dispatch(setToggleIsOn());
   };
+  const handleManualRelease = () => {
+    dispatch(toggleManualRelease())
+    dispatch(setManualOverride());
+  };
 
   const handleSettingsAllClick = () => {
     navigate('/plantbox/master');
@@ -97,6 +103,9 @@ export const Home = () => {
             allLights.filter((light) => light.ip==="192.168.0.137")[0].isOn
           }
         />
+        <ManualReleaseButton onClick={handleManualRelease} toggleManualOverride={manualOverride}>
+          Manual Release
+        </ManualReleaseButton>
         <SettingsButton onClick={handleSettingsAllClick}>
           Settings (all)
         </SettingsButton>

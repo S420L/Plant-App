@@ -102,6 +102,7 @@ const initialState = {
   },
   toggleIsOn: false,
   viewingIsOn: false,
+  manualOverride: true,
 };
 
 export const lightSlice = createSlice({
@@ -129,6 +130,12 @@ export const lightSlice = createSlice({
   },
     setViewingIsOn: (state, action) => {
       state.viewingIsOn = !state.viewingIsOn;
+    },
+    toggleManualRelease: (state, action) => {
+      console.log(`releasing manual control`);
+  },
+    setManualOverride: (state, action) => {
+      state.manualOverride = !state.manualOverride;
     },
     updateCurrentLightState: (state) => {
       state.currentLight.isOn = !state.currentLight.isOn;
@@ -183,7 +190,9 @@ export const {
   updateLightState,
   setToggleIsOn,
   setLightsState,
-  setViewingIsOn
+  setViewingIsOn,
+  setManualOverride,
+  toggleManualRelease
 } = lightSlice.actions;
 
 export const lightReducer = lightSlice.reducer;

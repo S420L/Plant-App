@@ -1,6 +1,6 @@
 import { takeLatest, put, call, select } from 'redux-saga/effects';
 import axios from 'axios';
-import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, toggleViewingState, updateLightState, setLightsState  } from './slice';
+import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, toggleViewingState, updateLightState, setLightsState, toggleManualRelease  } from './slice';
 
 // Selector to get the current light from the state
 const selectCurrentLight = (state) => state.light.currentLight;
@@ -43,7 +43,29 @@ function* fetchPinStates() {
   }
 }
 
+function* handleManualRelease() {
+  try {
+    // Select all lights from the Redux state
+    const lights = yield select((state) => state.light.lights);
+    
+    // hit manual release endpoint
+    let url_list = [];
+    for (let i = 0; i < lights.length; i++) {
+      let light = lights[i];
+    
+      const url = `http://${light.ip}/manual/release`;
+      console.log(`Calling ${url}`);
+      url_list.push(url);
+      
+    }
+     yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': url_list});
 
+     yield call(fetchPinStates);
+    
+  } catch (error) {
+    console.error('Error during manual override:', error);
+  }
+}
 
 function* handleToggleBoxes() {
   try {
@@ -222,6 +244,7 @@ export default function* rootSaga() {
   yield takeLatest(updateCurrentLightState.type, handleToggleBox);
   yield takeLatest(toggleLightState.type, handleToggleBoxes);
   yield takeLatest(toggleViewingState.type, handleViewingBoxes);
+  yield takeLatest(toggleManualRelease.type, handleManualRelease);
 
   yield takeLatest(updateLightTimers.type, function* (action) {
     const { timeOn, timeOff, startTime, endTime } = action.payload;
