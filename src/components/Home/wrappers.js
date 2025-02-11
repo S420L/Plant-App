@@ -1,20 +1,66 @@
 import styled from 'styled-components';
 
+export const WrapperOng = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 94vh;
+  width: 95vw;
+  background-color: #e0e0e0;  /* Background inside the border */
+  border: 8px solid #9e9e9e;  /* Distinct border color */
+  position: relative;
+  border-radius: 20px;  /* Curved corners for the main container */
+  overflow: hidden;
+
+  /* Outer shadow for overall lift */
+  box-shadow: 
+    6px 6px 12px rgba(0, 0, 0, 0.3), 
+    -6px -6px 12px rgba(255, 255, 255, 0.7);
+
+  /* Pseudo-element to create the 3D curved border effect */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8px;     /* Move inside the border */
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border-radius: 12px;  /* Slightly smaller radius to fit inside the border */
+    background: linear-gradient(145deg, #d0d0d0, #f0f0f0);  /* Lighter gradient for inner area */
+    box-shadow: 
+      inset 4px 4px 8px rgba(0, 0, 0, 0.2),   /* Inner shadows to add depth */
+      inset -4px -4px 8px rgba(255, 255, 255, 0.8);  /* Highlight for convex effect */
+    z-index: -1;  /* Ensure the pseudo-element is behind the content */
+  }
+
+  @media (min-width: 1420px) {
+    width: 25vw;
+  }
+`;
+
+
 export const GridContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 10px 20px;
-  width: 100%; /* Ensures full width for responsiveness */
+  width: 22vw;
+  height: 62vh;
   max-width: 1200px; /* Optional: Limit max width for larger screens */
-  background-color: #f9f9f9;
-  height: 69vh; /* Full screen height */
+  background-color: #eeeeee;
+  border: 4px solid #b0b0b0;  /* Darker border for contrast */
+border-radius: 10px;
+
+
+
   overflow-y: auto; /* Enable scrolling for dynamic content */
   overflow-x: hidden; /* Prevent horizontal scrolling */
   box-sizing: border-box;
 
   @media (max-width: 768px) {
-    padding: 5px 10px; /* Adjust padding for smaller screens */
+    padding: 5px 5px; /* Adjust padding for smaller screens */
+    width: 75vw;
   }
 `;
 

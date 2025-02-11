@@ -11,12 +11,14 @@ import {
   ViewingModeButton, // Add new styled button
   ButtonContainer,
   LightBoxWrapper,
-  ManualReleaseButton
+  ManualReleaseButton,
+  WrapperOng,
 } from './wrappers';
 
 export const Home = () => {
   const allLights = useSelector((state) => state.light.lights || []);
   const manualOverride = useSelector((state) => state.light.manualOverride || false);
+  console.log(manualOverride);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -87,7 +89,7 @@ export const Home = () => {
   };
 
   return (
-    <div>
+    <WrapperOng>
     <ButtonContainer>
         ON/OFF switch (all)
         <ToggleButton
@@ -122,6 +124,6 @@ export const Home = () => {
         ))}
       </div>
     </GridContainer>
-    </div>
+    </WrapperOng>
   );
 };
