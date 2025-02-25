@@ -28,6 +28,8 @@ export const Home = () => {
   const gridRef = useRef(null);
 
   const loadMoreLights = useCallback(() => {
+    console.log("in loadmorelights!@!!");
+    console.log(currentPage);
     const nextPage = currentPage + 1;
     const newLights = allLights.slice(
       nextPage * itemsPerPage,
@@ -42,6 +44,7 @@ export const Home = () => {
 
   // Initial load
   useEffect(() => {
+    setCurrentPage(0);
     if (allLights.length > 0) {
       setVisibleLights(allLights.slice(0, itemsPerPage));
     }
@@ -117,7 +120,7 @@ export const Home = () => {
       <div>
         {visibleLights.map((light, index) => (
           <LightBoxWrapper key={light.id}>
-            <LightBox onClick={() => handleBoxClick(light, index)} isOn={light.isOn}>
+            <LightBox onClick={() => handleBoxClick(light, index)} isOn={light.isOn} ip={light.ip}>
               {light.name || 'Untitled'}
             </LightBox>
           </LightBoxWrapper>

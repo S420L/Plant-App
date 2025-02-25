@@ -1,9 +1,32 @@
-import { takeLatest, put, call, select } from 'redux-saga/effects';
+import { takeLatest, put, call, select, delay, spawn } from 'redux-saga/effects';
 import axios from 'axios';
 import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, toggleViewingState, updateLightState, setLightsState, toggleManualRelease  } from './slice';
 
 // Selector to get the current light from the state
 const selectCurrentLight = (state) => state.light.currentLight;
+
+function* watchFanStatus() {
+  const ip = '192.168.0.154'; // Hardcoded IP
+  
+  while (true) {
+    try {
+      const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {
+        ip: [`http://${ip}/pin/status`],
+      });
+      console.log(response.data);
+      
+      const isOn = response.data[0].response.includes('LOW'); // Parse "LOW" (ON) from response
+
+      // Dispatch an action to update the state of the specific light
+      yield put(updateLightState({ ip, isOn }));
+    } catch (error) {
+      console.log(`Failed to fetch state for ${ip}:`, error);
+      yield put(updateLightState({ ip, isOn: false })); // Default to "OFF" on error
+    }
+
+    yield delay(3000); // Retry every 5 seconds
+  }
+}
 
 // Handle toggling the light ON/OFF
 function* handleToggleBox() {
@@ -20,7 +43,7 @@ function* handleToggleBox() {
 
 function* fetchPinStates() {
   try {
-    const lights = yield select((state) => state.light.lights);
+    var lights = yield select((state) => state.light.lights);
 
     // Iterate over each light and handle responses individually
     for (const light of lights) {
@@ -46,7 +69,8 @@ function* fetchPinStates() {
 function* handleManualRelease() {
   try {
     // Select all lights from the Redux state
-    const lights = yield select((state) => state.light.lights);
+    var lights = yield select((state) => state.light.lights);
+    lights = lights.filter((light) => light.name!=="fan");
     
     // hit manual release endpoint
     let url_list = [];
@@ -70,7 +94,8 @@ function* handleManualRelease() {
 function* handleToggleBoxes() {
   try {
     // Select all lights from the Redux state
-    const lights = yield select((state) => state.light.lights);
+    var lights = yield select((state) => state.light.lights);
+    lights = lights.filter((light) => light.name!=="fan");
 
     // Determine the majority state (on or off)
     const onCount = lights.filter((light) => light.isOn).length;
@@ -102,7 +127,8 @@ function* handleToggleBoxes() {
 function* handleViewingBoxes() {
   try {
     // Select all lights from the Redux state
-    const lights = yield select((state) => state.light.lights);
+    var lights = yield select((state) => state.light.lights);
+    lights = lights.filter((light) => light.name!=="fan");
 
     const viewingState = lights.filter((light) => light.ip === "192.168.0.137")[0].isOn;
     console.log(viewingState);
@@ -172,7 +198,8 @@ function* handleTimerChange(action) {
       if (!ip) {
         var url_list = [];
         // Master settings: Apply to all lights
-        const lights = yield select((state) => state.light.lights);
+        var lights = yield select((state) => state.light.lights);
+        lights = lights.filter((light) => light.name!=="fan");
         for (const light of lights) {
           url_list.push(`http://${light.ip}/timer?time_on=${timeOn}&time_off=${timeOff}`);
         }
@@ -215,7 +242,8 @@ function* handleTimeRangeChange(action) {
         var url_list = [];
         console.log("HERE first!!");
         // Master settings: Apply time range to all lights
-        const lights = yield select((state) => state.light.lights);
+        var lights = yield select((state) => state.light.lights);
+        lights = lights.filter((light) => light.name!=="fan" && light.ip !== "192.168.0.137");
         for (const light of lights) {
           url_list.push(`http://${light.ip}/timerange?start=${startTime}&end=${endTime}`);
         }
@@ -259,4 +287,7 @@ export default function* rootSaga() {
       yield* handleTimeRangeChange(action);
     }
   });
+
+    // Spawn non-blocking fan status watcher
+    yield spawn(watchFanStatus);
 }

@@ -77,7 +77,15 @@ export const LightBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${(props) => (props.isOn ? '#d4ffd4' : '#ffd4d4')};
+  background-color: ${(props) =>
+                        props.ip === "192.168.0.154"
+                          ? props.isOn
+                            ? "#d4d4ff" // Light blue when on
+                            : "#ffffd4" // Light yellow when off
+                          : props.isOn
+                          ? "#d4ffd4" // Light green when on
+                          : "#ffd4d4"
+                    }; // Light red when off
   border: 2px solid #ccc;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

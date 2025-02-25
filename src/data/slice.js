@@ -90,6 +90,15 @@ const initialState = {
       startTime: 0,
       endTime: 0,
     },
+    {
+      name: 'fan',
+      ip: '192.168.0.154',
+      isOn: false,
+      timeOn: 0,
+      timeOff: 0,
+      startTime: 0,
+      endTime: 0,
+    },
   ],
   currentLight: {
     name: '',
