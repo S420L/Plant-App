@@ -104,8 +104,8 @@ export const Home = () => {
         Viewing Mode
         <ViewingModeButton
           onClick={handleViewingMode}
-          viewingIsOn={
-            allLights.filter((light) => light.ip==="192.168.0.137")[0].isOn
+          viewingIsOn={false
+            //allLights.filter((light) => light.ip==="192.168.0.137")[0].isOn
           }
         />
         <ManualReleaseButton onClick={handleManualRelease} toggleManualOverride={manualOverride}>

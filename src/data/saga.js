@@ -5,7 +5,7 @@ import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLight
 // Selector to get the current light from the state
 const selectCurrentLight = (state) => state.light.currentLight;
 
-function* watchFanStatus() {
+/*function* watchFanStatus() {
   const ip = '192.168.0.154'; // Hardcoded IP
   
   while (true) {
@@ -26,7 +26,7 @@ function* watchFanStatus() {
 
     yield delay(3000); // Retry every 5 seconds
   }
-}
+}*/
 
 // Handle toggling the light ON/OFF
 function* handleToggleBox() {
@@ -130,7 +130,7 @@ function* handleViewingBoxes() {
     var lights = yield select((state) => state.light.lights);
     lights = lights.filter((light) => light.name!=="fan");
 
-    const viewingState = lights.filter((light) => light.ip === "192.168.0.137")[0].isOn;
+    const viewingState = false;//lights.filter((light) => light.ip === "192.168.0.137")[0].isOn;
     console.log(viewingState);
     // Target state for all lights
     const targetStateViewing = viewingState ? 'off' : 'on';
@@ -289,5 +289,5 @@ export default function* rootSaga() {
   });
 
     // Spawn non-blocking fan status watcher
-    yield spawn(watchFanStatus);
+    //yield spawn(watchFanStatus);
 }
