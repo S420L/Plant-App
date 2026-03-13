@@ -9,4 +9,4 @@ The plantbox has an on/off switch, cycle, and timerange settings. The settings/a
 
 There is an on/off switch for all lights on the homescreen, a viewing mode toggle (only weaker lights are turned on), and a manual reset button which sets all the lights back to their current timerange settings (lets say lights are programmed to be on 4am-10pm, and its 8pm and a light has been manually turned off--manual reset lets it default back to being on per its timerange settings).
 
-This app was created prior to the existence of claude code, and for now your goal is simply to overhaul the code and modernize the UI without degrading any of the current functionality.
+UI overhaul and modernization complete. All functionality intact.

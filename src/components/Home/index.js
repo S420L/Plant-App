@@ -17,6 +17,7 @@ import {
   LightBoxWrapper,
   ManualReleaseButton,
   WrapperOng,
+  TessaText,
 } from './wrappers';
 
 export const Home = () => {
@@ -132,6 +133,7 @@ export const Home = () => {
           </LightBoxWrapper>
         ))}
       </GridContainer>
+      <TessaText>🌸 Tessa is awesome 🌸</TessaText>
     </WrapperOng>
   );
 };
