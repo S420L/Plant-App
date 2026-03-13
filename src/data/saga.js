@@ -2,8 +2,6 @@ import { takeLatest, put, call, select } from 'redux-saga/effects';
 import axios from 'axios';
 import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, toggleViewingState, updateLightState, setLightsState, toggleManualRelease  } from './slice';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-
 // Selector to get the current light from the state
 const selectCurrentLight = (state) => state.light.currentLight;
 
@@ -12,7 +10,7 @@ const selectCurrentLight = (state) => state.light.currentLight;
   
   while (true) {
     try {
-      const response = yield call(axios.post, `${API_URL}/api/toggle_lights`, {
+      const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {
         ip: [`http://${ip}/pin/status`],
       });
       console.log(response.data);
@@ -36,7 +34,7 @@ function* handleToggleBox() {
     console.log("toggling current light");
     const { ip, isOn } = yield select(selectCurrentLight);
     const url = `http://${ip}/led/${isOn ? 'on' : 'off'}`;
-    const response = yield call(axios.post, `${API_URL}/api/toggle_lights`, {'ip': [url]});
+    const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': [url]});
     yield put(apiCallSuccess(response.data));
   } catch (error) {
     console.error('Toggle API call failed:', error);
@@ -50,7 +48,7 @@ function* fetchPinStates() {
     // Iterate over each light and handle responses individually
     for (const light of lights) {
       try {
-        const response = yield call(axios.post, `${API_URL}/api/toggle_lights`, {
+        const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', {
           ip: [`http://${light.ip}/pin/status`],
         });
         console.log(response.data);
@@ -84,7 +82,7 @@ function* handleManualRelease() {
       url_list.push(url);
       
     }
-     yield call(axios.post, `${API_URL}/api/toggle_lights`, {'ip': url_list});
+     yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': url_list});
 
      yield call(fetchPinStates);
     
@@ -119,7 +117,7 @@ function* handleToggleBoxes() {
       url_list.push(url);
       yield put(updateLightState({"ip": light.ip, "isOn": !majorityState}));
     }
-     yield call(axios.post, `${API_URL}/api/toggle_lights`, {'ip': url_list});
+     yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': url_list});
     
   } catch (error) {
     console.error('Error during toggle operation:', error);
@@ -161,7 +159,7 @@ function* handleViewingBoxes() {
         url_list.push(url);
         yield put(updateLightState({"ip": light.ip, "isOn": !viewingState}));
       }
-       yield call(axios.post, `${API_URL}/api/toggle_lights`, {'ip': url_list});
+       yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': url_list});
        url_list = [];
 
     for (let i = 0; i < non_viewing_lights.length; i++) {
@@ -171,7 +169,7 @@ function* handleViewingBoxes() {
       url_list.push(url);
       yield put(updateLightState({"ip": light.ip, "isOn": viewingState}));
     }
-     yield call(axios.post, `${API_URL}/api/toggle_lights`, {'ip': url_list});
+     yield call(axios.post, 'https://S420L.club/api/toggle_lights', {'ip': url_list});
     
   } catch (error) {
     console.error('Error during toggle operation:', error);
@@ -205,7 +203,7 @@ function* handleTimerChange(action) {
         for (const light of lights) {
           url_list.push(`http://${light.ip}/timer?time_on=${timeOn}&time_off=${timeOff}`);
         }
-        yield call(axios.post, `${API_URL}/api/toggle_lights`, { ip: url_list });
+        yield call(axios.post, 'https://S420L.club/api/toggle_lights', { ip: url_list });
         yield put({
           type: updateLightTimers.type,
           payload: { timeOn, timeOff },
@@ -214,7 +212,7 @@ function* handleTimerChange(action) {
       } else {
         // Individual light settings
         const url = `http://${ip}/timer?time_on=${timeOn}&time_off=${timeOff}`;
-        const response = yield call(axios.post, `${API_URL}/api/toggle_lights`, { ip: [url] });
+        const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', { ip: [url] });
         yield put(apiCallSuccess(response.data));
       }
     }
@@ -249,7 +247,7 @@ function* handleTimeRangeChange(action) {
         for (const light of lights) {
           url_list.push(`http://${light.ip}/timerange?start=${startTime}&end=${endTime}`);
         }
-        yield call(axios.post, `${API_URL}/api/toggle_lights`, { ip: url_list });
+        yield call(axios.post, 'https://S420L.club/api/toggle_lights', { ip: url_list });
         // Update masterLightBox and all lights in Redux state
         yield put({
           type: updateLightTimers.type,
@@ -259,7 +257,7 @@ function* handleTimeRangeChange(action) {
       } else {
         // Individual light settings
         const url = `http://${ip}/timerange?start=${startTime}&end=${endTime}`;
-        const response = yield call(axios.post, `${API_URL}/api/toggle_lights`, { ip: [url] });
+        const response = yield call(axios.post, 'https://S420L.club/api/toggle_lights', { ip: [url] });
         yield put(apiCallSuccess(response.data));
       }
     }

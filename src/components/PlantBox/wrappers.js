@@ -7,9 +7,10 @@ export const Box = styled.div`
   align-items: stretch;
   background: ${(props) =>
     props.isOn
-      ? 'radial-gradient(ellipse at top, rgba(244,114,182,0.08) 0%, #0d0918 60%)'
-      : 'radial-gradient(ellipse at top, rgba(167,139,250,0.07) 0%, #0d0918 60%)'
+      ? 'radial-gradient(ellipse at top, rgba(34,197,94,0.06) 0%, #0d1117 60%)'
+      : 'radial-gradient(ellipse at top, rgba(239,68,68,0.05) 0%, #0d1117 60%)'
   };
+  /* Extra top padding so content clears the absolute BackButton */
   padding: 68px 20px 40px;
   position: relative;
   box-sizing: border-box;
@@ -22,7 +23,7 @@ export const Box = styled.div`
   h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #f5e6ff;
+    color: #e6edf3;
     letter-spacing: -0.02em;
     margin: 0 0 24px;
     text-align: center;
@@ -32,8 +33,8 @@ export const Box = styled.div`
 export const SwitchContainer = styled.div`
   display: flex;
   height: 44px;
-  background: #160d27;
-  border: 1.5px solid #2d1b4e;
+  background: #161b22;
+  border: 1.5px solid #282e36;
   border-radius: 22px;
   overflow: hidden;
   margin: 0 0 24px;
@@ -53,19 +54,19 @@ export const SwitchButton = styled.div`
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   border-radius: 22px;
 
-  color: ${(props) => (props.active ? '#fff' : '#4d2d6e')};
+  color: ${(props) => (props.active ? '#fff' : '#4d5566')};
   background: ${(props) =>
     props.active
       ? props.isOnButton
-        ? 'linear-gradient(135deg, #db2777, #f472b6)'
-        : 'linear-gradient(135deg, #7c3aed, #a78bfa)'
+        ? 'linear-gradient(135deg, #16a34a, #22c55e)'
+        : 'linear-gradient(135deg, #b91c1c, #ef4444)'
       : 'transparent'
   };
   box-shadow: ${(props) =>
     props.active
       ? props.isOnButton
-        ? '0 2px 12px rgba(244,114,182,0.4)'
-        : '0 2px 12px rgba(167,139,250,0.35)'
+        ? '0 2px 12px rgba(34,197,94,0.3)'
+        : '0 2px 12px rgba(239,68,68,0.3)'
       : 'none'
   };
 
@@ -73,7 +74,7 @@ export const SwitchButton = styled.div`
     background: ${(props) =>
       props.active ? undefined : 'rgba(255,255,255,0.04)'
     };
-    color: ${(props) => (props.active ? '#fff' : '#9d77c4')};
+    color: ${(props) => (props.active ? '#fff' : '#8b949e')};
   }
 `;
 
@@ -81,8 +82,8 @@ export const FieldGroup = styled.div`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  background: #160d27;
-  border: 1.5px solid #2d1b4e;
+  background: #161b22;
+  border: 1.5px solid #282e36;
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
@@ -95,7 +96,7 @@ export const FieldTitle = styled.div`
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #9d77c4;
+  color: #8b949e;
   margin-bottom: 2px;
 `;
 
@@ -103,9 +104,9 @@ export const InputField = styled.input`
   padding: 10px 14px;
   font-size: 14px;
   font-weight: 400;
-  color: #f5e6ff;
-  background: #0d0918;
-  border: 1.5px solid #3d2060;
+  color: #e6edf3;
+  background: #0d1117;
+  border: 1.5px solid #3a4149;
   border-radius: 8px;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -114,12 +115,12 @@ export const InputField = styled.input`
   min-width: 0;
 
   &::placeholder {
-    color: #4d2d6e;
+    color: #4d5566;
   }
 
   &:focus {
-    border-color: #f472b6;
-    box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.15);
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
   }
 
   &::-webkit-inner-spin-button,
@@ -131,7 +132,7 @@ export const InputField = styled.input`
 
 export const SubmitButton = styled.button`
   padding: 13px 20px;
-  background: linear-gradient(135deg, #db2777, #f472b6);
+  background: linear-gradient(135deg, #16a34a, #22c55e);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -141,12 +142,12 @@ export const SubmitButton = styled.button`
   border-radius: 10px;
   cursor: pointer;
   transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.35);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.25);
   margin-top: 8px;
 
   &:hover {
     opacity: 0.9;
-    box-shadow: 0 6px 20px rgba(244, 114, 182, 0.5);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
   }
 
   &:active {
@@ -159,11 +160,11 @@ export const BackButton = styled.button`
   align-items: center;
   gap: 6px;
   padding: 6px 12px 6px 10px;
-  background: #160d27;
-  color: #c4a8e8;
+  background: #161b22;
+  color: #adbac7;
   font-size: 13px;
   font-weight: 500;
-  border: 1.5px solid #2d1b4e;
+  border: 1.5px solid #282e36;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -178,18 +179,18 @@ export const BackButton = styled.button`
     height: 0;
     border-top: 5px solid transparent;
     border-bottom: 5px solid transparent;
-    border-right: 7px solid #c4a8e8;
+    border-right: 7px solid #adbac7;
     flex-shrink: 0;
     transition: border-right-color 0.2s ease;
   }
 
   &:hover {
-    background: #1e1035;
-    border-color: #3d2060;
-    color: #f5e6ff;
+    background: #1c2333;
+    border-color: #30363d;
+    color: #e6edf3;
 
     &::before {
-      border-right-color: #f5e6ff;
+      border-right-color: #e6edf3;
     }
   }
 
@@ -203,13 +204,13 @@ export const ResetButton = styled.button`
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: #160d27;
-  color: #9d77c4;
+  background: #161b22;
+  color: #8b949e;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: 1.5px solid #2d1b4e;
+  border: 1.5px solid #282e36;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -218,9 +219,9 @@ export const ResetButton = styled.button`
   right: 20px;
 
   &:hover {
-    background: #1e1035;
-    border-color: #3d2060;
-    color: #f5e6ff;
+    background: #1c2333;
+    border-color: #30363d;
+    color: #e6edf3;
   }
 
   &:active {
@@ -259,7 +260,7 @@ export const WheelItem = styled.div`
   scroll-snap-align: center;
   font-size: ${(p) => (p.$selected ? '22px' : '17px')};
   font-weight: ${(p) => (p.$selected ? '600' : '400')};
-  color: ${(p) => (p.$selected ? '#f5e6ff' : '#4d2d6e')};
+  color: ${(p) => (p.$selected ? '#e6edf3' : '#4d5566')};
   transition: font-size 0.1s ease, color 0.1s ease;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
@@ -277,7 +278,7 @@ export const WheelOverlayTop = styled.div`
   left: 0;
   right: 0;
   height: 88px;
-  background: linear-gradient(to bottom, #160d27 15%, transparent 100%);
+  background: linear-gradient(to bottom, #161b22 15%, transparent 100%);
   pointer-events: none;
 `;
 
@@ -287,7 +288,7 @@ export const WheelOverlayBottom = styled.div`
   left: 0;
   right: 0;
   height: 88px;
-  background: linear-gradient(to top, #160d27 15%, transparent 100%);
+  background: linear-gradient(to top, #161b22 15%, transparent 100%);
   pointer-events: none;
 `;
 
@@ -297,8 +298,8 @@ export const WheelSelector = styled.div`
   left: 4px;
   right: 4px;
   height: 44px;
-  border-top: 1.5px solid #3d2060;
-  border-bottom: 1.5px solid #3d2060;
+  border-top: 1.5px solid #3a4149;
+  border-bottom: 1.5px solid #3a4149;
   pointer-events: none;
 `;
 
@@ -307,7 +308,7 @@ export const WheelUnit = styled.div`
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #4d2d6e;
+  color: #4d5566;
   margin-top: 4px;
   height: 16px;
 `;
@@ -322,7 +323,7 @@ export const PickerRow = styled.div`
 export const PickerColon = styled.div`
   font-size: 20px;
   font-weight: 700;
-  color: #4d2d6e;
+  color: #4d5566;
   padding-bottom: 20px;
   flex-shrink: 0;
 `;
@@ -332,7 +333,7 @@ export const PickerRowLabel = styled.div`
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #4d2d6e;
+  color: #4d5566;
   text-align: center;
 `;
 
@@ -341,12 +342,12 @@ export const PickerTrigger = styled.button`
   align-items: center;
   width: 100%;
   padding: 10px 14px;
-  background: #0d0918;
-  border: 1.5px solid ${(p) => (p.$active ? '#f472b6' : '#3d2060')};
+  background: #0d1117;
+  border: 1.5px solid ${(p) => (p.$active ? '#22c55e' : '#3a4149')};
   border-radius: ${(p) => (p.$active ? '8px 8px 0 0' : '8px')};
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: ${(p) => (p.$active ? '0 0 0 3px rgba(244,114,182,0.15)' : 'none')};
+  box-shadow: ${(p) => (p.$active ? '0 0 0 3px rgba(34,197,94,0.12)' : 'none')};
   text-align: left;
   gap: 8px;
 `;
@@ -356,7 +357,7 @@ export const PickerTriggerLabel = styled.span`
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #4d2d6e;
+  color: #4d5566;
   flex-shrink: 0;
 `;
 
@@ -364,7 +365,7 @@ export const PickerTriggerValue = styled.span`
   flex: 1;
   font-size: 14px;
   font-weight: 400;
-  color: ${(p) => (p.$empty ? '#4d2d6e' : '#f5e6ff')};
+  color: ${(p) => (p.$empty ? '#4d5566' : '#e6edf3')};
   font-variant-numeric: tabular-nums;
   text-align: right;
 `;
@@ -372,18 +373,18 @@ export const PickerTriggerValue = styled.span`
 export const PickerChevron = styled.span`
   flex-shrink: 0;
   font-size: 10px;
-  color: ${(p) => (p.$open ? '#f472b6' : '#4d2d6e')};
+  color: ${(p) => (p.$open ? '#22c55e' : '#4d5566')};
   transform: ${(p) => (p.$open ? 'rotate(180deg)' : 'rotate(0deg)')};
   transition: transform 0.2s ease, color 0.2s ease;
   line-height: 1;
 `;
 
 export const PickerExpandArea = styled.div`
-  background: #0d0918;
-  border: 1.5px solid #f472b6;
+  background: #0d1117;
+  border: 1.5px solid #22c55e;
   border-top: none;
   border-radius: 0 0 8px 8px;
-  box-shadow: 0 0 0 3px rgba(244,114,182,0.15);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
   padding: 8px 0 4px;
   display: flex;
   flex-direction: column;
@@ -400,12 +401,12 @@ export const AmPmRow = styled.div`
 export const AmPmButton = styled.button`
   flex: 1;
   padding: 7px 20px;
-  background: ${(p) => (p.$active ? 'rgba(244,114,182,0.15)' : 'transparent')};
-  color: ${(p) => (p.$active ? '#f472b6' : '#4d2d6e')};
+  background: ${(p) => (p.$active ? 'rgba(34,197,94,0.15)' : 'transparent')};
+  color: ${(p) => (p.$active ? '#22c55e' : '#4d5566')};
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  border: 1.5px solid ${(p) => (p.$active ? 'rgba(244,114,182,0.5)' : '#3d2060')};
+  border: 1.5px solid ${(p) => (p.$active ? 'rgba(34,197,94,0.45)' : '#3a4149')};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
