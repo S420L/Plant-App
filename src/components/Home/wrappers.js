@@ -1,264 +1,240 @@
 import styled from 'styled-components';
 
 export const WrapperOng = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 94vh;
-  width: 95vw;
-  background-color: #e0e0e0;  /* Background inside the border */
-  border: 8px solid #9e9e9e;  /* Distinct border color */
-  position: relative;
-  border-radius: 20px;  /* Curved corners for the main container */
+  display: block;
+  padding: 24px 0 32px;
+  min-height: 100dvh;
+  background: #0d1117;
   overflow: hidden;
 
-  /* Outer shadow for overall lift */
-  box-shadow: 
-    6px 6px 12px rgba(0, 0, 0, 0.3), 
-    -6px -6px 12px rgba(255, 255, 255, 0.7);
-
-  /* Pseudo-element to create the 3D curved border effect */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 8px;     /* Move inside the border */
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    border-radius: 12px;  /* Slightly smaller radius to fit inside the border */
-    background: linear-gradient(145deg, #d0d0d0, #f0f0f0);  /* Lighter gradient for inner area */
-    box-shadow: 
-      inset 4px 4px 8px rgba(0, 0, 0, 0.2),   /* Inner shadows to add depth */
-      inset -4px -4px 8px rgba(255, 255, 255, 0.8);  /* Highlight for convex effect */
-    z-index: -1;  /* Ensure the pseudo-element is behind the content */
-  }
-
-  @media (min-width: 1420px) {
-    width: 25vw;
+  @media (min-width: 768px) {
+    min-height: 100%;
   }
 `;
-
 
 export const GridContainer = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 10px 20px;
-  width: 22vw;
-  height: 62vh;
-  max-width: 1200px; /* Optional: Limit max width for larger screens */
-  background-color: #eeeeee;
-  border: 4px solid #b0b0b0;  /* Darker border for contrast */
-border-radius: 10px;
-
-
-
-  overflow-y: auto; /* Enable scrolling for dynamic content */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  box-sizing: border-box;
-
-  @media (max-width: 768px) {
-    padding: 5px 5px; /* Adjust padding for smaller screens */
-    width: 75vw;
-  }
+  gap: 12px;
+  margin: 0 16px;
 `;
 
 export const LightBoxWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 20px; /* Space between items */
+  display: block;
 `;
 
 export const LightBox = styled.div`
-  width: 250px; /* Fixed width for stability */
-  height: 160px; /* Matches item size */
+  height: 80px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: ${(props) =>
-                        props.ip === "192.168.0.154"
-                          ? props.isOn
-                            ? "#d4d4ff" // Light blue when on
-                            : "#ffffd4" // Light yellow when off
-                          : props.isOn
-                          ? "#d4ffd4" // Light green when on
-                          : "#ffd4d4"
-                    }; // Light red when off
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 0 20px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.2s, background-color 0.3s;
-  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 
-  @media (min-width: 768px) {
-    width: 20vw; /* Dynamic width for medium screens */
-    height: 20vh; /* Dynamic height for medium screens */
+  border: 1.5px solid ${(props) =>
+    props.ip === '192.168.0.154'
+      ? props.isOn ? 'rgba(99, 102, 241, 0.5)' : 'rgba(250, 204, 21, 0.4)'
+      : props.isOn ? 'rgba(34, 197, 94, 0.45)' : 'rgba(239, 68, 68, 0.4)'
+  };
+
+  background: ${(props) =>
+    props.ip === '192.168.0.154'
+      ? props.isOn ? 'rgba(99, 102, 241, 0.14)' : 'rgba(250, 204, 21, 0.10)'
+      : props.isOn ? 'rgba(34, 197, 94, 0.14)' : 'rgba(239, 68, 68, 0.10)'
+  };
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  /* Left accent bar */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 12px 0 0 12px;
+    background: ${(props) =>
+      props.ip === '192.168.0.154'
+        ? props.isOn ? '#6366f1' : '#facc15'
+        : props.isOn ? '#22c55e' : '#ef4444'
+    };
+    box-shadow: ${(props) =>
+      props.ip === '192.168.0.154'
+        ? props.isOn ? '0 0 8px rgba(99,102,241,0.7)' : '0 0 8px rgba(250,204,21,0.5)'
+        : props.isOn ? '0 0 10px rgba(34,197,94,0.6)' : '0 0 8px rgba(239,68,68,0.5)'
+    };
   }
 
   &:hover {
-    transform: translateY(-5px);
-    background-color: #e6f7ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    border-color: ${(props) =>
+      props.ip === '192.168.0.154'
+        ? props.isOn ? 'rgba(99,102,241,0.7)' : 'rgba(250,204,21,0.6)'
+        : props.isOn ? 'rgba(34,197,94,0.6)' : 'rgba(239,68,68,0.5)'
+    };
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 
-export const HomeTitle = styled.h1`
-  font-size: 1.5rem;
-  color: #333;
-  text-align: center;
-  margin-bottom: 20px; /* Add spacing between title and buttons */
-  z-index: 1; /* Ensure it appears above any overlapping content */
+export const LightBoxName = styled.span`
+  font-size: 15px;
+  font-weight: 500;
+  color: #e6edf3;
+  letter-spacing: 0.01em;
+  margin-left: 8px;
+`;
 
-  @media (max-width: 768px) {
-    font-size: 1.2rem; /* Adjust for mobile screens */
-  }
+export const LightBoxStatus = styled.span`
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: ${(props) => (props.isOn ? '#22c55e' : '#ef4444')};
 `;
 
 export const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin: 0 16px 20px;
+`;
+
+export const ControlRow = styled.div`
+  display: flex;
   align-items: center;
-  gap: 15px; /* Add spacing between buttons */
-  margin-bottom: 20px; /* Add spacing below the buttons */
-  z-index: 1; /* Ensure it stays above the grid content */
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #161b22;
+  border: 1.5px solid #282e36;
+  border-radius: 10px;
+`;
+
+export const ControlLabel = styled.span`
+  font-size: 13px;
+  font-weight: 500;
+  color: #8b949e;
 `;
 
 export const ToggleButton = styled.button`
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  background-color: ${(props) => (props.toggleIsOn ? '#4caf50' : '#ccc')};
+  width: 44px;
+  height: 24px;
+  background-color: ${(props) => (props.toggleIsOn ? '#22c55e' : '#30363d')};
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  position: relative; /* Needed for proper alignment of the pseudo-element */
-  overflow: hidden; /* Ensures the pseudo-element doesn't extend outside the button */
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: ${(props) => props.toggleIsOn ? '0 0 12px rgba(34,197,94,0.4)' : 'none'};
 
   &::before {
     content: '';
-    width: 20px;
-    height: 20px;
-    background-color: white;
+    width: 18px;
+    height: 18px;
+    background: #fff;
     border-radius: 50%;
-    position: absolute; /* Aligns relative to the button */
-    top: 2.5px; /* Centers vertically within the button */
-    left: ${(props) => (props.toggleIsOn ? 'calc(100% - 23px)' : '2.5px')}; /* Toggles position */
-    transition: left 0.3s;
+    position: absolute;
+    top: 3px;
+    left: ${(props) => (props.toggleIsOn ? 'calc(100% - 21px)' : '3px')};
+    transition: left 0.25s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   }
 
   &:hover {
-    background-color: ${(props) => (props.toggleIsOn ? '#45a049' : '#bbb')};
-  }
-
-  &:active::before {
-    width: 22px;
-    height: 22px;
-  }
-`;
-
-export const SettingsButton = styled.button`
-  display: inline-block;
-  width: auto;
-  padding: 6px 12px;
-  background-color: #4caf50;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s, transform 0.2s;
-
-  &:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    background-color: #3d8b41;
-    transform: translateY(1px);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 3px #4caf50;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    font-size: 10px;
-  }
-`;
-
-export const ManualReleaseButton = styled.button`
-  display: inline-block;
-  width: auto;
-  padding: 6px 12px;
-  background-color: ${(props) => (props.toggleManualOverride ? '#45a049' : '#bbb')};
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s, transform 0.2s;
-
-  &:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    background-color: #3d8b41;
-    transform: translateY(1px);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 3px #4caf50;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    font-size: 10px;
+    background-color: ${(props) => (props.toggleIsOn ? '#16a34a' : '#3d444d')};
   }
 `;
 
 export const ViewingModeButton = styled.button`
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  background-color: ${(props) => (props.viewingIsOn ? '#4caf50' : '#ccc')};
+  width: 44px;
+  height: 24px;
+  background-color: ${(props) => (props.viewingIsOn ? '#22c55e' : '#30363d')};
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  position: relative; /* Needed for proper alignment of the pseudo-element */
-  overflow: hidden; /* Ensures the pseudo-element doesn't extend outside the button */
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: ${(props) => props.viewingIsOn ? '0 0 12px rgba(34,197,94,0.4)' : 'none'};
 
   &::before {
     content: '';
-    width: 20px;
-    height: 20px;
-    background-color: white;
+    width: 18px;
+    height: 18px;
+    background: #fff;
     border-radius: 50%;
-    position: absolute; /* Aligns relative to the button */
-    top: 2.5px; /* Centers vertically within the button */
-    left: ${(props) => (props.viewingIsOn ? 'calc(100% - 23px)' : '2.5px')}; /* Toggles position */
-    transition: left 0.3s;
+    position: absolute;
+    top: 3px;
+    left: ${(props) => (props.viewingIsOn ? 'calc(100% - 21px)' : '3px')};
+    transition: left 0.25s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   }
 
   &:hover {
-    background-color: ${(props) => (props.viewingIsOn ? '#45a049' : '#bbb')};
+    background-color: ${(props) => (props.viewingIsOn ? '#16a34a' : '#3d444d')};
+  }
+`;
+
+export const ActionRow = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+export const ManualReleaseButton = styled.button`
+  flex: 1;
+  padding: 10px 16px;
+  background: ${(props) => props.toggleManualOverride ? 'rgba(34,197,94,0.08)' : '#161b22'};
+  color: ${(props) => props.toggleManualOverride ? '#22c55e' : '#8b949e'};
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid ${(props) => props.toggleManualOverride ? 'rgba(34,197,94,0.4)' : '#282e36'};
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${(props) => props.toggleManualOverride ? 'rgba(34,197,94,0.14)' : '#1c2333'};
+    color: ${(props) => props.toggleManualOverride ? '#4ade80' : '#adbac7'};
+    border-color: ${(props) => props.toggleManualOverride ? 'rgba(34,197,94,0.55)' : '#30363d'};
   }
 
-  &:active::before {
-    width: 22px;
-    height: 22px;
+  &:active {
+    transform: scale(0.97);
+  }
+`;
+
+export const SettingsButton = styled.button`
+  flex: 1;
+  padding: 10px 16px;
+  background: #161b22;
+  color: #e6edf3;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid #282e36;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #1c2333;
+    border-color: #30363d;
+  }
+
+  &:active {
+    transform: scale(0.97);
   }
 `;

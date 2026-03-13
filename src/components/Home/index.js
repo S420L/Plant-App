@@ -5,11 +5,15 @@ import { setCurrentLight, toggleLightState, setToggleIsOn, setViewingIsOn, toggl
 import {
   GridContainer,
   LightBox,
-  HomeTitle,
+  LightBoxName,
+  LightBoxStatus,
   ToggleButton,
   SettingsButton,
-  ViewingModeButton, // Add new styled button
+  ViewingModeButton,
   ButtonContainer,
+  ControlRow,
+  ControlLabel,
+  ActionRow,
   LightBoxWrapper,
   ManualReleaseButton,
   WrapperOng,
@@ -78,7 +82,7 @@ export const Home = () => {
     dispatch(setToggleIsOn());
   };
   const handleManualRelease = () => {
-    dispatch(toggleManualRelease())
+    dispatch(toggleManualRelease());
     dispatch(setManualOverride());
   };
 
@@ -91,42 +95,43 @@ export const Home = () => {
     dispatch(setViewingIsOn());
   };
 
+  const lightsOnCount = allLights.filter((light) => light.isOn).length;
+  const majorityOn = lightsOnCount > allLights.length / 2;
+
   return (
     <WrapperOng>
-    <ButtonContainer>
-        ON/OFF switch (all)
-        <ToggleButton
-          onClick={handleToggleAll}
-          toggleIsOn={
-            allLights.filter((light) => light.isOn).length > allLights.length / 2
-          }
-        />
-        Viewing Mode
-        <ViewingModeButton
-          onClick={handleViewingMode}
-          viewingIsOn={false
-            //allLights.filter((light) => light.ip==="192.168.0.137")[0].isOn
-          }
-        />
-        <ManualReleaseButton onClick={handleManualRelease} toggleManualOverride={manualOverride}>
-          Manual Release
-        </ManualReleaseButton>
-        <SettingsButton onClick={handleSettingsAllClick}>
-          Settings (all)
-        </SettingsButton>
+      <ButtonContainer>
+        <ControlRow>
+          <ControlLabel>ON / OFF (all)</ControlLabel>
+          <ToggleButton onClick={handleToggleAll} toggleIsOn={majorityOn} />
+        </ControlRow>
+        <ControlRow>
+          <ControlLabel>Viewing Mode</ControlLabel>
+          <ViewingModeButton
+            onClick={handleViewingMode}
+            viewingIsOn={false}
+          />
+        </ControlRow>
+        <ActionRow>
+          <ManualReleaseButton onClick={handleManualRelease} toggleManualOverride={manualOverride}>
+            Manual Release
+          </ManualReleaseButton>
+          <SettingsButton onClick={handleSettingsAllClick}>
+            Settings (all)
+          </SettingsButton>
+        </ActionRow>
       </ButtonContainer>
-    <GridContainer ref={gridRef}>
-      
-      <div>
+
+      <GridContainer ref={gridRef}>
         {visibleLights.map((light, index) => (
-          <LightBoxWrapper key={light.id}>
+          <LightBoxWrapper key={light.id || index}>
             <LightBox onClick={() => handleBoxClick(light, index)} isOn={light.isOn} ip={light.ip}>
-              {light.name || 'Untitled'}
+              <LightBoxName>{light.name || 'Untitled'}</LightBoxName>
+              <LightBoxStatus isOn={light.isOn}>{light.isOn ? 'ON' : 'OFF'}</LightBoxStatus>
             </LightBox>
           </LightBoxWrapper>
         ))}
-      </div>
-    </GridContainer>
+      </GridContainer>
     </WrapperOng>
   );
 };

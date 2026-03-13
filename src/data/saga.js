@@ -1,4 +1,4 @@
-import { takeLatest, put, call, select, delay, spawn } from 'redux-saga/effects';
+import { takeLatest, put, call, select } from 'redux-saga/effects';
 import axios from 'axios';
 import { updateLightTimers, updateCurrentLightState, apiCallSuccess, toggleLightState, toggleViewingState, updateLightState, setLightsState, toggleManualRelease  } from './slice';
 
