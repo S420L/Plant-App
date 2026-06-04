@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentLight, toggleLightState, setToggleIsOn, setViewingIsOn, toggleViewingState, setManualOverride, toggleManualRelease, fetchUnclaimedDevices, claimDevice } from '../../data/slice';
-import { logout, getUser } from '../../data/auth';
+import { logout, getUser, forceRefresh } from '../../data/auth';
 import {
   GridContainer,
   LightBox,
@@ -125,6 +125,7 @@ export const Home = () => {
     <WrapperOng>
       <HeaderRow>
         <HeaderTitle>{user?.username ? `${user.username}'s Grow Lights` : 'Grow Lights'}</HeaderTitle>
+        <LogoutButton onClick={forceRefresh} title="Force cache clear + reload">↻</LogoutButton>
         <LogoutButton onClick={logout}>Sign out</LogoutButton>
       </HeaderRow>
       <ButtonContainer>
