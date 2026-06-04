@@ -241,7 +241,11 @@ export const PlantBox = () => {
 
   const handleUnclaim = () => {
     if (!currentLight?.mac) return;
-    const ok = window.confirm(`Remove "${currentLight.name}" from your lights?\n\nThe device stays online but you'll need to re-claim it from the unclaimed list to control it again.`);
+    const ok = window.confirm(
+      `Remove "${currentLight.name}" from your lights?\n\n` +
+      `The device's WiFi credentials will be wiped and it will reboot into setup mode. ` +
+      `You'll need to reconnect to its PlantLight-XXXX WiFi and configure it again to use it.`
+    );
     if (!ok) return;
     dispatch(unclaimDevice({ mac: currentLight.mac }));
     navigate('/');

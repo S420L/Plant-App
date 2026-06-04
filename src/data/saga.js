@@ -130,6 +130,10 @@ function* handleRenameDevice(action) {
 function* handleUnclaimDevice(action) {
   try {
     const { mac } = action.payload;
+    // Tell the device to wipe its saved WiFi creds and reboot into the
+    // captive portal. Fire this before the DELETE so the device starts
+    // resetting while we update the registry.
+    publishMqtt(`plantapp/device/${mac}/cmd/wifi_reset`, '');
     yield call(axios.delete, `${API_BASE}/api/me/devices/${mac}`);
     yield put(removeLight({ mac }));
   } catch (err) {
