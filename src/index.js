@@ -1,11 +1,19 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+//import { HelmetProvider } from 'react-helmet-async';
+//import { BrowserRouter } from 'react-router-dom';
+//import { ThemeProvider } from 'styled-components';
+//import ReactModal from 'react-modal';
+import { App } from './App';
+import store from './data/store';
+//import { GlobalStyle } from './shared/globalStyle';
+//import themePrimary from './shared/themePrimary';
 
 // Cache nuke on every page load. iOS Safari (especially) hangs onto stale
 // assets across deploys; this kills any service worker registrations and
-// CacheStorage entries before React even renders. Fire-and-forget — we
-// don't block render on it.
+// CacheStorage entries before React renders. Fire-and-forget — we don't
+// block render on it.
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations()
     .then((regs) => regs.forEach((r) => r.unregister()))
@@ -16,14 +24,6 @@ if ('caches' in window) {
     .then((names) => names.forEach((name) => caches.delete(name)))
     .catch(() => {});
 }
-//import { HelmetProvider } from 'react-helmet-async';
-//import { BrowserRouter } from 'react-router-dom';
-//import { ThemeProvider } from 'styled-components';
-//import ReactModal from 'react-modal';
-import { App } from './App';
-import store from './data/store';
-//import { GlobalStyle } from './shared/globalStyle';
-//import themePrimary from './shared/themePrimary';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
