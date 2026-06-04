@@ -333,6 +333,11 @@ async def unclaim_device(
     if ud is None:
         raise HTTPException(status_code=404, detail="Device not claimed by this user")
     await session.delete(ud)
+    # Also drop the registry row so the device doesn't linger as unclaimed.
+    # When it gets re-provisioned, it'll self-register a fresh row.
+    device = await session.get(Device, mac)
+    if device:
+        await session.delete(device)
     await session.commit()
     return {"status": "ok"}
 
