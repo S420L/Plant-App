@@ -1,9 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Home } from './components/Home';
 import { PlantBox } from './components/PlantBox';
+import { Login } from './components/Login';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
+import { fetchUserDevices } from './data/slice';
 
 /* Full-viewport centering shell — only visible on desktop */
 const Shell = styled.div`
@@ -61,9 +63,21 @@ const PhoneApp = styled.div`
 
 export const App = () => {
   const dispatch = useDispatch();
+  const [authed, setAuthed] = useState(() => !!localStorage.getItem('plantapp-token'));
+
   useEffect(() => {
-    dispatch({ type: 'APP/INIT_FETCH_PIN_STATES' });
-  }, [dispatch]);
+    if (authed) dispatch(fetchUserDevices());
+  }, [authed, dispatch]);
+
+  if (!authed) {
+    return (
+      <Shell>
+        <PhoneApp>
+          <Login onLogin={() => setAuthed(true)} />
+        </PhoneApp>
+      </Shell>
+    );
+  }
 
   return (
     <Router>

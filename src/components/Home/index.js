@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setCurrentLight, toggleLightState, setToggleIsOn, setViewingIsOn, toggleViewingState, setManualOverride, toggleManualRelease } from '../../data/slice';
+import { setCurrentLight, toggleLightState, setToggleIsOn, setViewingIsOn, toggleViewingState, setManualOverride, toggleManualRelease, fetchUnclaimedDevices, claimDevice } from '../../data/slice';
+import { logout } from '../../data/auth';
 import {
   GridContainer,
   LightBox,
@@ -17,11 +18,20 @@ import {
   LightBoxWrapper,
   ManualReleaseButton,
   WrapperOng,
+  AddLightButton,
+  UnclaimedPanel,
+  UnclaimedItem,
+  UnclaimedMac,
+  ClaimButton,
+  EmptyUnclaimed,
+  LogoutButton,
 } from './wrappers';
 
 export const Home = () => {
   const allLights = useSelector((state) => state.light.lights || []);
+  const unclaimedDevices = useSelector((state) => state.light.unclaimedDevices || []);
   const manualOverride = useSelector((state) => state.light.manualOverride || false);
+  const [showUnclaimed, setShowUnclaimed] = useState(false);
   console.log(manualOverride);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -95,11 +105,24 @@ export const Home = () => {
     dispatch(setViewingIsOn());
   };
 
+  const handleToggleUnclaimed = () => {
+    const next = !showUnclaimed;
+    setShowUnclaimed(next);
+    if (next) dispatch(fetchUnclaimedDevices());
+  };
+
+  const handleClaim = (mac) => {
+    const nickname = window.prompt(`Name for ${mac}?`, mac);
+    if (nickname === null) return;
+    dispatch(claimDevice({ mac, nickname: nickname.trim() || null }));
+  };
+
   const lightsOnCount = allLights.filter((light) => light.isOn).length;
   const majorityOn = lightsOnCount > allLights.length / 2;
 
   return (
     <WrapperOng>
+      <LogoutButton onClick={logout}>Sign out</LogoutButton>
       <ButtonContainer>
         <ControlRow>
           <ControlLabel>ON / OFF (all)</ControlLabel>
@@ -120,6 +143,23 @@ export const Home = () => {
             Settings (all)
           </SettingsButton>
         </ActionRow>
+        <AddLightButton onClick={handleToggleUnclaimed}>
+          {showUnclaimed ? 'Hide unclaimed lights' : '+ Add Light'}
+        </AddLightButton>
+        {showUnclaimed && (
+          <UnclaimedPanel>
+            {unclaimedDevices.length === 0 ? (
+              <EmptyUnclaimed>No unclaimed devices found. Power up a light or register one.</EmptyUnclaimed>
+            ) : (
+              unclaimedDevices.map((d) => (
+                <UnclaimedItem key={d.mac}>
+                  <UnclaimedMac>{d.mac}</UnclaimedMac>
+                  <ClaimButton onClick={() => handleClaim(d.mac)}>Claim</ClaimButton>
+                </UnclaimedItem>
+              ))
+            )}
+          </UnclaimedPanel>
+        )}
       </ButtonContainer>
 
       <GridContainer ref={gridRef}>

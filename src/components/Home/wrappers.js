@@ -1,5 +1,108 @@
 import styled from 'styled-components';
 
+export const LogoutButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 6px 12px;
+  background: transparent;
+  color: #8b949e;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid #21262d;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+
+  &:hover {
+    background: #161b22;
+    color: #e6edf3;
+    border-color: #30363d;
+  }
+`;
+
+export const AddLightButton = styled.button`
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #161b22;
+  color: #adbac7;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1.5px dashed #30363d;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #1c2333;
+    border-color: #3a4149;
+    color: #e6edf3;
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+`;
+
+export const UnclaimedPanel = styled.div`
+  margin-top: 10px;
+  background: #0d1117;
+  border: 1.5px solid #21262d;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const UnclaimedItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+`;
+
+export const UnclaimedMac = styled.span`
+  font-family: monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: #adbac7;
+`;
+
+export const ClaimButton = styled.button`
+  padding: 7px 14px;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
+
+  &:hover { opacity: 0.92; }
+  &:active { transform: scale(0.97); }
+`;
+
+export const EmptyUnclaimed = styled.div`
+  color: #4d5566;
+  font-size: 12px;
+  text-align: center;
+  padding: 12px 8px;
+  font-style: italic;
+`;
+
+
 export const WrapperOng = styled.div`
   display: block;
   padding: 24px 0 32px;

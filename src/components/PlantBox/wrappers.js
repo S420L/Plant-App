@@ -130,6 +130,62 @@ export const InputField = styled.input`
   }
 `;
 
+export const BrightnessHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+export const BrightnessValue = styled.span`
+  font-size: 15px;
+  font-weight: 700;
+  color: #22c55e;
+  font-variant-numeric: tabular-nums;
+`;
+
+export const BrightnessSlider = styled.input`
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  margin: 4px 0;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  background: ${(p) => {
+    const pct = Math.max(0, Math.min(100, p.$value ?? 0));
+    return `linear-gradient(to right, #22c55e 0%, #22c55e ${pct}%, #0d1117 ${pct}%, #0d1117 100%)`;
+  }};
+  border: 1.5px solid #3a4149;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e6edf3;
+    border: 2px solid #22c55e;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.35);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  &::-webkit-slider-thumb:active {
+    transform: scale(1.15);
+  }
+
+  &::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e6edf3;
+    border: 2px solid #22c55e;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.35);
+    cursor: pointer;
+  }
+`;
+
 export const SubmitButton = styled.button`
   padding: 13px 20px;
   background: linear-gradient(135deg, #16a34a, #22c55e);

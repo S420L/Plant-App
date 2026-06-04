@@ -8,53 +8,8 @@ const initialState = {
     startTime: 0,
     endTime: 0,
   },
-  lights: [
-    {
-      name: 'Bigass one',
-      ip: '192.168.1.18',
-      isOn: false,
-      timeOn: 0,
-      timeOff: 0,
-      startTime: 0,
-      endTime: 0,
-    },
-    {
-      name: 'Flatass one',
-      ip: '192.168.1.107',
-      isOn: false,
-      timeOn: 0,
-      timeOff: 0,
-      startTime: 0,
-      endTime: 0,
-    },
-    {
-      name: 'Left downstairs',
-      ip: '192.168.1.124',
-      isOn: false,
-      timeOn: 0,
-      timeOff: 0,
-      startTime: 0,
-      endTime: 0,
-    },
-    {
-      name: 'Right downstairs',
-      ip: '192.168.1.123',
-      isOn: false,
-      timeOn: 0,
-      timeOff: 0,
-      startTime: 0,
-      endTime: 0,
-    },
-    {
-      name: 'Upstairs',
-      ip: '192.168.1.125',
-      isOn: false,
-      timeOn: 0,
-      timeOff: 0,
-      startTime: 0,
-      endTime: 0,
-    },
-  ],
+  // Hardcoded lights removed — populated by GET /api/me/devices on boot.
+  lights: [],
   currentLight: {
     name: '',
     ip: '',
@@ -67,6 +22,7 @@ const initialState = {
   toggleIsOn: false,
   viewingIsOn: false,
   manualOverride: true,
+  unclaimedDevices: [],
 };
 
 export const lightSlice = createSlice({
@@ -103,24 +59,18 @@ export const lightSlice = createSlice({
     },
     updateCurrentLightState: (state) => {
       state.currentLight.isOn = !state.currentLight.isOn;
-      const light = state.lights.find((l) => l.ip === state.currentLight.ip);
-      if (light) {
-        console.log("toggling current light");
-        light.isOn = state.currentLight.isOn;
-      }
+      const light = state.lights.find((l) => l.mac === state.currentLight.mac);
+      if (light) light.isOn = state.currentLight.isOn;
     },
     updateLightState: (state, action) => {
-      const { ip, isOn } = action.payload;
-      const light = state.lights.find((l) => l.ip === ip);
-      console.log(`updating state of light ${ip}`);
-      if (light) {
-        light.isOn = isOn;
-      }
+      const { mac, isOn } = action.payload;
+      const light = state.lights.find((l) => l.mac === mac);
+      if (light) light.isOn = isOn;
     },
     updateLightTimers: (state, action) => {
-      const { ip, timeOn, timeOff, startTime, endTime } = action.payload;
-      if (!ip) {
-        // Update all lights when `ip` is missing (master settings)
+      const { mac, timeOn, timeOff, startTime, endTime } = action.payload;
+      if (!mac) {
+        // Master settings — apply to all lights.
         state.lights.forEach((light) => {
           light.timeOn = timeOn ?? light.timeOn;
           light.timeOff = timeOff ?? light.timeOff;
@@ -129,12 +79,65 @@ export const lightSlice = createSlice({
         });
         state.masterLightBox = { name: 'Settings for all', timeOn, timeOff, startTime, endTime };
       } else {
-        const light = state.lights.find((l) => l.ip === ip);
+        const light = state.lights.find((l) => l.mac === mac);
         if (light) {
           light.timeOn = timeOn ?? light.timeOn;
           light.timeOff = timeOff ?? light.timeOff;
           light.startTime = startTime ?? light.startTime;
           light.endTime = endTime ?? light.endTime;
+        }
+      }
+    },
+    updateBrightness: (state, action) => {
+      const { mac, level } = action.payload;
+      const light = state.lights.find((l) => l.mac === mac);
+      if (light) light.brightness = level;
+      if (state.currentLight.mac === mac) state.currentLight.brightness = level;
+    },
+    // Saga trigger — handled by handleFetchUserDevices; payload ignored
+    fetchUserDevices: () => {},
+    // Saga trigger — handled by handleFetchUnclaimedDevices
+    fetchUnclaimedDevices: () => {},
+    // Saga trigger — payload { mac, nickname }; handled by handleClaimDevice
+    claimDevice: () => {},
+    // Reducer — merges devices returned by GET /api/me/devices into state.lights
+    // Existing entries (matched by mac) get their name updated to the nickname;
+    // unknown MACs are added as new light tiles.
+    mergeRegistryDevices: (state, action) => {
+      const devices = action.payload || [];
+      devices.forEach((rd) => {
+        const existing = state.lights.find((l) => l.mac === rd.mac);
+        if (existing) {
+          if (rd.nickname) existing.name = rd.nickname;
+        } else {
+          state.lights.push({
+            name: rd.nickname || rd.mac,
+            ip: '',
+            mac: rd.mac,
+            isOn: false,
+            timeOn: 0,
+            timeOff: 0,
+            startTime: 0,
+            endTime: 0,
+          });
+        }
+      });
+    },
+    setUnclaimedDevices: (state, action) => {
+      state.unclaimedDevices = action.payload || [];
+    },
+    mqttStatusReceived: (state, action) => {
+      const { mac, key, value } = action.payload;
+      const light = state.lights.find((l) => l.mac === mac);
+      if (!light) return;
+      if (key === 'led') {
+        light.isOn = value === 'on';
+        if (state.currentLight.mac === mac) state.currentLight.isOn = value === 'on';
+      } else if (key === 'brightness') {
+        const level = parseInt(value, 10);
+        if (!Number.isNaN(level)) {
+          light.brightness = level;
+          if (state.currentLight.mac === mac) state.currentLight.brightness = level;
         }
       }
     },
@@ -156,7 +159,14 @@ export const {
   setLightsState,
   setViewingIsOn,
   setManualOverride,
-  toggleManualRelease
+  toggleManualRelease,
+  updateBrightness,
+  mqttStatusReceived,
+  fetchUserDevices,
+  fetchUnclaimedDevices,
+  claimDevice,
+  mergeRegistryDevices,
+  setUnclaimedDevices
 } = lightSlice.actions;
 
 export const lightReducer = lightSlice.reducer;

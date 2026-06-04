@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { setCurrentLight, updateLightTimers, updateCurrentLightState } from '../../data/slice';
+import { setCurrentLight, updateLightTimers, updateCurrentLightState, updateBrightness } from '../../data/slice';
 import {
   Box,
   SwitchContainer,
@@ -29,6 +29,9 @@ import {
   AmPmRow,
   AmPmButton,
   ResetButton,
+  BrightnessHeader,
+  BrightnessValue,
+  BrightnessSlider,
 } from './wrappers';
 
 /* ── Value arrays (defined once outside render) ── */
@@ -109,6 +112,9 @@ export const PlantBox = () => {
   const [endM, setEndM]           = useState(null);
   const [endAmPm, setEndAmPm]     = useState('AM');
 
+  // Brightness (0-100)
+  const [brightness, setBrightness] = useState(100);
+
   // Accordion: which field is expanded
   const [activeField, setActiveField] = useState(null);
   const toggleField = (key) => setActiveField((prev) => (prev === key ? null : key));
@@ -131,6 +137,8 @@ export const PlantBox = () => {
   // Initialize pickers from currentLight whenever the light changes
   useEffect(() => {
     if (!currentLight?.name) return;
+
+    setBrightness(currentLight.brightness ?? 100);
 
     const toHMS = (dec) => {
       const total = Math.round((dec || 0) * 3600);
@@ -186,7 +194,7 @@ export const PlantBox = () => {
     const currentStartTime = currentLight.startTime;
     const currentEndTime   = currentLight.endTime;
 
-    const payload = { ip: currentLight.ip };
+    const payload = { mac: currentLight.mac };
     let hasTimerChanged     = false;
     let hasTimeRangeChanged = false;
 
@@ -218,6 +226,11 @@ export const PlantBox = () => {
   };
 
   const toggleLight = () => dispatch(updateCurrentLightState());
+  const handleBrightnessSlide = (e) => {
+    const level = Number(e.target.value);
+    setBrightness(level);
+    dispatch(updateBrightness({ mac: currentLight.mac, level }));
+  };
   const handleBack  = () => navigate(-1);
   const handleReset = () => {
     setOnH(null); setOnM(null); setOnS(null);
@@ -321,11 +334,20 @@ export const PlantBox = () => {
       <BackButton onClick={handleBack}>Back</BackButton>
       <ResetButton onClick={handleReset}>Reset</ResetButton>
       <h2>{currentLight.name || 'Unknown Light'}</h2>
-      <FieldGroup>
-        <FieldTitle>IP Address</FieldTitle>
-        <p style={{ margin: 0, fontSize: '15px', fontWeight: 500, color: '#adbac7', fontFamily: 'monospace', letterSpacing: '0.03em' }}>
-          {currentLight.ip}
-        </p>
+      <FieldGroup onClick={(e) => e.stopPropagation()}>
+        <BrightnessHeader>
+          <FieldTitle>Brightness</FieldTitle>
+          <BrightnessValue>{brightness}%</BrightnessValue>
+        </BrightnessHeader>
+        <BrightnessSlider
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          value={brightness}
+          $value={brightness}
+          onChange={handleBrightnessSlide}
+        />
       </FieldGroup>
       <SwitchContainer>
         <SwitchButton active={currentLight.isOn}  isOnButton onClick={toggleLight}>ON</SwitchButton>
