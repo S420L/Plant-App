@@ -67,6 +67,9 @@ const unsigned long mqttReconnectInterval = 5000;
 #define TIME_START_ADDR  0   // float, 4 bytes
 #define TIME_END_ADDR    4   // float, 4 bytes
 #define BRIGHTNESS_ADDR  8   // int, 4 bytes
+#define BOOT_COUNT_ADDR  12  // uint16_t, 2 bytes — increments every boot,
+                             // appended to captive-portal SSID so iOS
+                             // sees a fresh network each provisioning cycle
 
 void logMessage(String message) {
   // Print to Serial Monitor
@@ -318,14 +321,26 @@ void setup() {
   applyBrightness(storedBrightness, false); // Apply restored value without re-saving
   logMessage("Dimmer initialized on GPIO 21");
 
+  // Bump the boot counter — appended to the captive-portal SSID so iOS
+  // treats every reset cycle as a brand-new network and (re-)triggers
+  // captive portal detection instead of relying on stale per-SSID memory.
+  uint16_t bootCount = 0;
+  EEPROM.get(BOOT_COUNT_ADDR, bootCount);
+  if (bootCount > 60000) bootCount = 0;  // fresh EEPROM reads 0xFFFF
+  bootCount++;
+  EEPROM.put(BOOT_COUNT_ADDR, bootCount);
+  EEPROM.commit();
+  logMessage("Boot count: " + String(bootCount));
+
   // Bring up WiFi via captive portal if no creds saved (WiFiManager).
-  // Phone connects to "PlantLight-<MAC>" SoftAP, captive portal pops the
-  // setup form, user picks SSID + password, saved to NVS.
+  // Phone connects to "PlantLight-<MAC>-<bootCount>" SoftAP, captive
+  // portal pops the setup form, user picks SSID + password, saved to NVS.
   {
     WiFiManager wm;
     wm.setConfigPortalTimeout(180);  // 3 min, then reboot and try again
     String apName = "PlantLight-" + WiFi.macAddress();
     apName.replace(":", "");
+    apName += "-" + String(bootCount);
     bool ok = wm.autoConnect(apName.c_str());
     if (!ok) {
       logMessage("WiFi config portal timed out — rebooting");

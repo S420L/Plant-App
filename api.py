@@ -6,7 +6,7 @@ from typing import Optional
 
 import aiohttp
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -81,6 +81,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Tell every browser to never cache API responses. iOS Safari in particular
+# is aggressive about caching JSON GETs across reloads; the only reliable
+# fix is explicit no-store on the response. Applies to every endpoint.
+@app.middleware("http")
+async def add_no_cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 
 # ---------- Auth helpers ----------

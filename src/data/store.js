@@ -12,6 +12,16 @@ if (storedToken) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
 }
 
+// Belt-and-suspenders cache buster on every GET. Safari iOS happily
+// caches API responses across reloads even with no-store headers, so
+// we make each URL unique with a timestamp query param.
+axios.interceptors.request.use((config) => {
+  if ((config.method || 'get').toLowerCase() === 'get') {
+    config.params = { ...(config.params || {}), _t: Date.now() };
+  }
+  return config;
+});
+
 // On 401 from an authenticated endpoint, the token is invalid/expired —
 // clear it and reload, which sends the user back to the login screen.
 // EXCEPTION: don't auto-reload for /api/auth/* — those are the login and
