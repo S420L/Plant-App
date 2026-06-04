@@ -13,6 +13,10 @@ import {
   fetchUserDevices,
   fetchUnclaimedDevices,
   claimDevice,
+  renameDevice,
+  unclaimDevice,
+  removeLight,
+  renameLight,
   mergeRegistryDevices,
   setUnclaimedDevices,
   updateLightState,
@@ -110,6 +114,26 @@ function* handleClaimDevice(action) {
     yield call(handleFetchUnclaimedDevices);
   } catch (err) {
     console.error('claimDevice failed:', err);
+  }
+}
+
+function* handleRenameDevice(action) {
+  try {
+    const { mac, nickname } = action.payload;
+    yield call(axios.patch, `${API_BASE}/api/me/devices/${mac}`, { nickname });
+    yield put(renameLight({ mac, nickname }));
+  } catch (err) {
+    console.error('renameDevice failed:', err);
+  }
+}
+
+function* handleUnclaimDevice(action) {
+  try {
+    const { mac } = action.payload;
+    yield call(axios.delete, `${API_BASE}/api/me/devices/${mac}`);
+    yield put(removeLight({ mac }));
+  } catch (err) {
+    console.error('unclaimDevice failed:', err);
   }
 }
 
@@ -216,6 +240,8 @@ export default function* rootSaga() {
   yield takeLatest(fetchUserDevices.type, handleFetchUserDevices);
   yield takeLatest(fetchUnclaimedDevices.type, handleFetchUnclaimedDevices);
   yield takeLatest(claimDevice.type, handleClaimDevice);
+  yield takeLatest(renameDevice.type, handleRenameDevice);
+  yield takeLatest(unclaimDevice.type, handleUnclaimDevice);
 
   yield spawn(watchMqtt);
 }

@@ -130,6 +130,63 @@ export const InputField = styled.input`
   }
 `;
 
+export const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 24px;
+
+  h2 {
+    margin: 0;
+  }
+`;
+
+export const EditNameButton = styled.button`
+  flex-shrink: 0;
+  padding: 5px 10px;
+  background: transparent;
+  color: #8b949e;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid #21262d;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #161b22;
+    color: #e6edf3;
+    border-color: #30363d;
+  }
+
+  &:active { transform: scale(0.97); }
+`;
+
+export const UnclaimButton = styled.button`
+  margin-top: 14px;
+  padding: 11px 18px;
+  background: transparent;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.7);
+  }
+
+  &:active { transform: scale(0.98); }
+`;
+
 export const BrightnessHeader = styled.div`
   display: flex;
   align-items: center;

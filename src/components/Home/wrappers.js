@@ -1,9 +1,28 @@
 import styled from 'styled-components';
 
+export const HeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px 16px;
+`;
+
+export const HeaderTitle = styled.h1`
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #e6edf3;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 export const LogoutButton = styled.button`
-  position: absolute;
-  top: 16px;
-  right: 16px;
+  flex-shrink: 0;
   padding: 6px 12px;
   background: transparent;
   color: #8b949e;
@@ -15,7 +34,6 @@ export const LogoutButton = styled.button`
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
-  z-index: 10;
 
   &:hover {
     background: #161b22;

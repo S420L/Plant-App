@@ -12,6 +12,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.engine.url import URL
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import Field, SQLModel, select
 
@@ -179,7 +180,12 @@ async def auth_register(body: RegisterRequest, session: AsyncSession = Depends(g
         display_name=body.display_name or username,
     )
     session.add(user)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError:
+        # UNIQUE(username) caught a race between the pre-check and commit.
+        await session.rollback()
+        raise HTTPException(status_code=409, detail="Username already taken")
     return {
         "token": create_access_token(user.id),
         "user": {"id": user.id, "username": user.username, "display_name": user.display_name},

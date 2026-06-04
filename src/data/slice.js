@@ -100,6 +100,23 @@ export const lightSlice = createSlice({
     fetchUnclaimedDevices: () => {},
     // Saga trigger — payload { mac, nickname }; handled by handleClaimDevice
     claimDevice: () => {},
+    // Saga trigger — payload { mac, nickname }; handled by handleRenameDevice
+    renameDevice: () => {},
+    // Saga trigger — payload { mac }; handled by handleUnclaimDevice
+    unclaimDevice: () => {},
+    // Reducer — removes a light from state.lights once unclaim succeeds
+    removeLight: (state, action) => {
+      const { mac } = action.payload;
+      state.lights = state.lights.filter((l) => l.mac !== mac);
+      if (state.currentLight.mac === mac) state.currentLight = { name: '', ip: '', mac: '', isOn: false, timeOn: 0, timeOff: 0, startTime: 0, endTime: 0 };
+    },
+    // Reducer — applies a new nickname to an existing light
+    renameLight: (state, action) => {
+      const { mac, nickname } = action.payload;
+      const light = state.lights.find((l) => l.mac === mac);
+      if (light) light.name = nickname;
+      if (state.currentLight.mac === mac) state.currentLight.name = nickname;
+    },
     // Reducer — merges devices returned by GET /api/me/devices into state.lights
     // Existing entries (matched by mac) get their name updated to the nickname;
     // unknown MACs are added as new light tiles.
@@ -165,6 +182,10 @@ export const {
   fetchUserDevices,
   fetchUnclaimedDevices,
   claimDevice,
+  renameDevice,
+  unclaimDevice,
+  removeLight,
+  renameLight,
   mergeRegistryDevices,
   setUnclaimedDevices
 } = lightSlice.actions;

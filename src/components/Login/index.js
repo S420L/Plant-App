@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { setToken } from '../../data/auth';
+import { setAuth } from '../../data/auth';
 import {
   LoginContainer,
   LoginCard,
@@ -30,7 +30,7 @@ export const Login = ({ onLogin }) => {
     try {
       const path = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
       const response = await axios.post(`${API_BASE}${path}`, { username, password });
-      setToken(response.data.token);
+      setAuth(response.data.token, response.data.user);
       onLogin();
     } catch (err) {
       const detail = err.response?.data?.detail;

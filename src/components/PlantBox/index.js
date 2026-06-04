@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { setCurrentLight, updateLightTimers, updateCurrentLightState, updateBrightness } from '../../data/slice';
+import { setCurrentLight, updateLightTimers, updateCurrentLightState, updateBrightness, renameDevice, unclaimDevice } from '../../data/slice';
 import {
   Box,
   SwitchContainer,
@@ -32,6 +32,9 @@ import {
   BrightnessHeader,
   BrightnessValue,
   BrightnessSlider,
+  TitleRow,
+  EditNameButton,
+  UnclaimButton,
 } from './wrappers';
 
 /* ── Value arrays (defined once outside render) ── */
@@ -226,6 +229,24 @@ export const PlantBox = () => {
   };
 
   const toggleLight = () => dispatch(updateCurrentLightState());
+
+  const handleEditName = () => {
+    if (!currentLight?.mac) return;
+    const next = window.prompt('New name for this light:', currentLight.name || '');
+    if (next === null) return;
+    const trimmed = next.trim();
+    if (!trimmed || trimmed === currentLight.name) return;
+    dispatch(renameDevice({ mac: currentLight.mac, nickname: trimmed }));
+  };
+
+  const handleUnclaim = () => {
+    if (!currentLight?.mac) return;
+    const ok = window.confirm(`Remove "${currentLight.name}" from your lights?\n\nThe device stays online but you'll need to re-claim it from the unclaimed list to control it again.`);
+    if (!ok) return;
+    dispatch(unclaimDevice({ mac: currentLight.mac }));
+    navigate('/');
+  };
+
   const handleBrightnessSlide = (e) => {
     const level = Number(e.target.value);
     setBrightness(level);
@@ -333,7 +354,10 @@ export const PlantBox = () => {
     <Box isOn={currentLight.isOn} onClick={dismissPicker}>
       <BackButton onClick={handleBack}>Back</BackButton>
       <ResetButton onClick={handleReset}>Reset</ResetButton>
-      <h2>{currentLight.name || 'Unknown Light'}</h2>
+      <TitleRow>
+        <h2>{currentLight.name || 'Unknown Light'}</h2>
+        <EditNameButton onClick={handleEditName} title="Rename">Edit</EditNameButton>
+      </TitleRow>
       <FieldGroup onClick={(e) => e.stopPropagation()}>
         <BrightnessHeader>
           <FieldTitle>Brightness</FieldTitle>
@@ -356,6 +380,7 @@ export const PlantBox = () => {
       {cycleSection}
       {timeRangeSection}
       <SubmitButton onClick={handleSubmit}>Submit</SubmitButton>
+      <UnclaimButton onClick={handleUnclaim}>Remove this light</UnclaimButton>
     </Box>
   );
 };

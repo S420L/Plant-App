@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentLight, toggleLightState, setToggleIsOn, setViewingIsOn, toggleViewingState, setManualOverride, toggleManualRelease, fetchUnclaimedDevices, claimDevice } from '../../data/slice';
-import { logout } from '../../data/auth';
+import { logout, getUser } from '../../data/auth';
 import {
   GridContainer,
   LightBox,
@@ -25,6 +25,8 @@ import {
   ClaimButton,
   EmptyUnclaimed,
   LogoutButton,
+  HeaderRow,
+  HeaderTitle,
 } from './wrappers';
 
 export const Home = () => {
@@ -32,6 +34,7 @@ export const Home = () => {
   const unclaimedDevices = useSelector((state) => state.light.unclaimedDevices || []);
   const manualOverride = useSelector((state) => state.light.manualOverride || false);
   const [showUnclaimed, setShowUnclaimed] = useState(false);
+  const user = getUser();
   console.log(manualOverride);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -122,7 +125,10 @@ export const Home = () => {
 
   return (
     <WrapperOng>
-      <LogoutButton onClick={logout}>Sign out</LogoutButton>
+      <HeaderRow>
+        <HeaderTitle>{user?.username ? `${user.username}'s Grow Lights` : 'Grow Lights'}</HeaderTitle>
+        <LogoutButton onClick={logout}>Sign out</LogoutButton>
+      </HeaderRow>
       <ButtonContainer>
         <ControlRow>
           <ControlLabel>ON / OFF (all)</ControlLabel>
