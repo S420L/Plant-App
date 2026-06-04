@@ -12,12 +12,17 @@ if (storedToken) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
 }
 
-// On 401 from any axios call, the token is invalid/expired —
+// On 401 from an authenticated endpoint, the token is invalid/expired —
 // clear it and reload, which sends the user back to the login screen.
+// EXCEPTION: don't auto-reload for /api/auth/* — those are the login and
+// register endpoints, which legitimately return 401 on bad credentials, and
+// the Login component needs to surface that error to the user.
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url || '';
+    const isAuthEndpoint = url.includes('/api/auth/');
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem('plantapp-token');
       delete axios.defaults.headers.common['Authorization'];
       window.location.reload();
