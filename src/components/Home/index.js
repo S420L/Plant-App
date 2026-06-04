@@ -59,12 +59,10 @@ export const Home = () => {
     }
   }, [allLights, currentPage]);
 
-  // Initial load
+  // Re-paginate whenever allLights changes (including down to zero).
   useEffect(() => {
     setCurrentPage(0);
-    if (allLights.length > 0) {
-      setVisibleLights(allLights.slice(0, itemsPerPage));
-    }
+    setVisibleLights(allLights.slice(0, itemsPerPage));
   }, [allLights]);
 
   // Scroll detection

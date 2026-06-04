@@ -215,6 +215,7 @@ void mqttOnMessage(char* topic, byte* payload, unsigned int length) {
     delay(200);
     WiFiManager wm;
     wm.resetSettings();
+    WiFi.disconnect(true, true);  // wifioff + eraseap — clears system-level WiFi config too
     delay(500);
     ESP.restart();
   }
@@ -572,6 +573,7 @@ void loop() {
       client.stop();
       WiFiManager wm;
       wm.resetSettings();
+      WiFi.disconnect(true, true);
       delay(500);
       ESP.restart();
 } else {
