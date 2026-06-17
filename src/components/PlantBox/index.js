@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { setCurrentLight, updateLightTimers, updateCurrentLightState, updateBrightness, renameDevice, unclaimDevice } from '../../data/slice';
+import { setCurrentLight, updateLightTimers, updateCurrentLightState, updateBrightness, updateFullSpectrum, renameDevice, unclaimDevice } from '../../data/slice';
 import {
   Box,
   SwitchContainer,
   SwitchButton,
+  SpectrumRow,
+  SpectrumLabel,
+  SpectrumToggle,
   FieldGroup,
   FieldTitle,
   SubmitButton,
@@ -230,6 +233,11 @@ export const PlantBox = () => {
 
   const toggleLight = () => dispatch(updateCurrentLightState());
 
+  const toggleFullSpectrum = () => {
+    if (!currentLight?.mac) return;
+    dispatch(updateFullSpectrum({ mac: currentLight.mac, on: !(currentLight.fullSpectrum ?? true) }));
+  };
+
   const handleEditName = () => {
     if (!currentLight?.mac) return;
     const next = window.prompt('New name for this light:', currentLight.name || '');
@@ -381,6 +389,10 @@ export const PlantBox = () => {
         <SwitchButton active={currentLight.isOn}  isOnButton onClick={toggleLight}>ON</SwitchButton>
         <SwitchButton active={!currentLight.isOn}            onClick={toggleLight}>OFF</SwitchButton>
       </SwitchContainer>
+      <SpectrumRow>
+        <SpectrumLabel>Full Spectrum</SpectrumLabel>
+        <SpectrumToggle $on={currentLight.fullSpectrum ?? true} onClick={toggleFullSpectrum} />
+      </SpectrumRow>
       {cycleSection}
       {timeRangeSection}
       <SubmitButton onClick={handleSubmit}>Submit</SubmitButton>

@@ -26,8 +26,16 @@ String deviceMac;
 #define DIMMER_RES_BITS  10      // 10-bit resolution: 0..1023 internally
 #define DIMMER_MAX_DUTY  1023    // (1 << DIMMER_RES_BITS) - 1
 
+// Full spectrum control on GPIO 22 — drives IRLZ44N gate that grounds
+// the strands' white wires. HIGH = whites grounded = full spectrum.
+// LOW = whites floating = reduced spectrum (red/blue base mode).
+#define SPECTRUM_PIN 22
+
 // Current brightness in percent (0-100). Loaded from EEPROM on boot, defaults to 100.
 int brightnessPercent = 100;
+
+// Current full-spectrum state. Loaded from EEPROM on boot, defaults to true.
+bool fullSpectrum = true;
 
 // Create an instance of WiFiServer
 WiFiServer server(80);
@@ -70,6 +78,7 @@ const unsigned long mqttReconnectInterval = 5000;
 #define BOOT_COUNT_ADDR  12  // uint16_t, 2 bytes — increments every boot,
                              // appended to captive-portal SSID so iOS
                              // sees a fresh network each provisioning cycle
+#define SPECTRUM_ADDR    14  // uint8_t, 1 byte — 1 = full spectrum, 0 = reduced
 
 void logMessage(String message) {
   // Print to Serial Monitor
@@ -103,6 +112,22 @@ void applyBrightness(int percent, bool persist) {
   }
 
   logMessage("Brightness set to " + String(percent) + "% (duty " + String(duty) + "/" + String(DIMMER_MAX_DUTY) + ")" + (persist ? " [saved]" : ""));
+}
+
+// Apply full spectrum on/off via GPIO 22 -> IRLZ44N gate -> white wires.
+// HIGH gate = MOSFET on = whites grounded = full spectrum.
+// LOW gate = MOSFET off = whites floating = reduced spectrum.
+void applyFullSpectrum(bool on, bool persist) {
+  fullSpectrum = on;
+  digitalWrite(SPECTRUM_PIN, on ? HIGH : LOW);
+
+  if (persist) {
+    uint8_t v = on ? 1 : 0;
+    EEPROM.put(SPECTRUM_ADDR, v);
+    EEPROM.commit();
+  }
+
+  logMessage("Full spectrum set to " + String(on ? "ON" : "OFF") + (persist ? " [saved]" : ""));
 }
 
 // ---------- Registry ----------
@@ -141,6 +166,7 @@ void mqttPublishCurrentState() {
   int pinState = digitalRead(CONTROL_PIN);
   mqttPublishStatus("led", pinState == LOW ? "on" : "off");
   mqttPublishStatus("brightness", String(brightnessPercent));
+  mqttPublishStatus("fullspectrum", fullSpectrum ? "true" : "false");
 }
 
 void mqttOnMessage(char* topic, byte* payload, unsigned int length) {
@@ -171,6 +197,16 @@ void mqttOnMessage(char* topic, byte* payload, unsigned int length) {
   else if (action == "brightness/reset") {
     applyBrightness(100, true);
     mqttPublishStatus("brightness", "100");
+  }
+  else if (action == "fullspectrum") {
+    // Accept "true"/"false", "on"/"off", "1"/"0"
+    String pl = p; pl.toLowerCase();
+    bool on;
+    if (pl == "true" || pl == "on" || pl == "1") on = true;
+    else if (pl == "false" || pl == "off" || pl == "0") on = false;
+    else return;
+    applyFullSpectrum(on, true);
+    mqttPublishStatus("fullspectrum", fullSpectrum ? "true" : "false");
   }
   else if (action == "timer") {
     // Payload "<on_hrs>:<off_hrs>" e.g. "18:6"
@@ -311,6 +347,13 @@ void setup() {
     logMessage("Restored brightness from EEPROM: " + String(storedBrightness) + "%");
   }
 
+  // Restore full spectrum state from EEPROM. Fresh EEPROM reads as 0xFF
+  // which is neither 0 nor 1, so we treat anything but 0 as "on" (default).
+  uint8_t storedSpectrum = 1;
+  EEPROM.get(SPECTRUM_ADDR, storedSpectrum);
+  bool initialSpectrum = (storedSpectrum != 0);  // 0 = off; anything else (incl. 0xFF) = on
+  logMessage("Restored full spectrum from EEPROM: " + String(initialSpectrum ? "ON" : "OFF"));
+
   // Set CONTROL_PIN as output
   pinMode(CONTROL_PIN, OUTPUT);
   digitalWrite(CONTROL_PIN, HIGH); // Start with pin OFF (Active LOW)
@@ -320,6 +363,11 @@ void setup() {
   ledcAttach(DIMMER_PIN, DIMMER_FREQ, DIMMER_RES_BITS);
   applyBrightness(storedBrightness, false); // Apply restored value without re-saving
   logMessage("Dimmer initialized on GPIO 21");
+
+  // Set up SPECTRUM_PIN as a digital output and apply restored state.
+  pinMode(SPECTRUM_PIN, OUTPUT);
+  applyFullSpectrum(initialSpectrum, false);  // Apply restored value without re-saving
+  logMessage("Full spectrum control initialized on GPIO " + String(SPECTRUM_PIN));
 
   // Bump the boot counter — appended to the captive-portal SSID so iOS
   // treats every reset cycle as a brand-new network and (re-)triggers
@@ -498,6 +546,48 @@ void loop() {
       client.print("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\n\r\nBrightness reset to 100%.");
       logMessage("Brightness reset to 100%");
       mqttPublishStatus("brightness", "100");
+    }
+    // Full spectrum endpoint: /fullspectrum/?true or /fullspectrum/?false
+    // Also accepts on/off, 1/0 for convenience.
+    else if (request.indexOf("/fullspectrum/?") != -1 || request.indexOf("/fullspectrum?") != -1) {
+      int qIdx = request.indexOf("/fullspectrum/?");
+      int valStart;
+      if (qIdx != -1) {
+        valStart = qIdx + 15;  // length of "/fullspectrum/?"
+      } else {
+        qIdx = request.indexOf("/fullspectrum?");
+        valStart = qIdx + 14;  // length of "/fullspectrum?"
+      }
+      int valEnd = request.indexOf(" ", valStart);
+      if (valEnd == -1) valEnd = request.length();
+      String valStr = request.substring(valStart, valEnd);
+      int amp = valStr.indexOf('&');
+      if (amp != -1) valStr = valStr.substring(0, amp);
+      valStr.toLowerCase();
+
+      bool valid = true;
+      bool on;
+      if (valStr == "true" || valStr == "on" || valStr == "1") on = true;
+      else if (valStr == "false" || valStr == "off" || valStr == "0") on = false;
+      else valid = false;
+
+      if (!valid) {
+        client.print("HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nFull spectrum value must be true/false (or on/off, 1/0).");
+        logMessage("Rejected fullspectrum request: '" + valStr + "'");
+      } else {
+        applyFullSpectrum(on, true);
+        client.print("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\n\r\nFull spectrum set to " + String(on ? "true" : "false"));
+        mqttPublishStatus("fullspectrum", fullSpectrum ? "true" : "false");
+      }
+    }
+    // Full spectrum status endpoint
+    else if (request.indexOf("/fullspectrum/status") != -1) {
+      client.print("HTTP/1.1 200 OK\r\n");
+      client.print("Content-Type: text/plain\r\n");
+      client.print("Access-Control-Allow-Origin: *\r\n");
+      client.print("Connection: close\r\n\r\n");
+      client.print("Full spectrum: " + String(fullSpectrum ? "true" : "false"));
+      logMessage("Served full spectrum status: " + String(fullSpectrum ? "true" : "false"));
     }
     // Manual ON/OFF endpoints
     else if (request.indexOf("/led/on") != -1) {

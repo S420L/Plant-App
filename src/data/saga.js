@@ -9,6 +9,7 @@ import {
   toggleViewingState,
   toggleManualRelease,
   updateBrightness,
+  updateFullSpectrum,
   mqttStatusReceived,
   fetchUserDevices,
   fetchUnclaimedDevices,
@@ -183,6 +184,12 @@ function* handleBrightnessChange(action) {
   publishMqtt(`plantapp/device/${mac}/cmd/brightness`, String(level));
 }
 
+function* handleFullSpectrumChange(action) {
+  const { mac, on } = action.payload;
+  if (!mac) return;
+  publishMqtt(`plantapp/device/${mac}/cmd/fullspectrum`, on ? 'true' : 'false');
+}
+
 function* handleTimerChange(action) {
   if (action.meta?.selfDispatched) return;
   const { mac, timeOn, timeOff } = action.payload;
@@ -234,6 +241,7 @@ export default function* rootSaga() {
   yield takeLatest(toggleViewingState.type, handleViewingBoxes);
   yield takeLatest(toggleManualRelease.type, handleManualRelease);
   yield throttle(150, updateBrightness.type, handleBrightnessChange);
+  yield takeLatest(updateFullSpectrum.type, handleFullSpectrumChange);
 
   yield takeLatest(updateLightTimers.type, function* (action) {
     const { timeOn, timeOff, startTime, endTime } = action.payload;

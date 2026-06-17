@@ -94,6 +94,13 @@ export const lightSlice = createSlice({
       if (light) light.brightness = level;
       if (state.currentLight.mac === mac) state.currentLight.brightness = level;
     },
+    // Optimistic update + saga trigger — payload { mac, on }; saga publishes cmd/fullspectrum
+    updateFullSpectrum: (state, action) => {
+      const { mac, on } = action.payload;
+      const light = state.lights.find((l) => l.mac === mac);
+      if (light) light.fullSpectrum = on;
+      if (state.currentLight.mac === mac) state.currentLight.fullSpectrum = on;
+    },
     // Saga trigger — handled by handleFetchUserDevices; payload ignored
     fetchUserDevices: () => {},
     // Saga trigger — handled by handleFetchUnclaimedDevices
@@ -132,6 +139,7 @@ export const lightSlice = createSlice({
             ip: '',
             mac: rd.mac,
             isOn: false,
+            fullSpectrum: true,
             timeOn: 0,
             timeOff: 0,
             startTime: 0,
@@ -156,6 +164,10 @@ export const lightSlice = createSlice({
           light.brightness = level;
           if (state.currentLight.mac === mac) state.currentLight.brightness = level;
         }
+      } else if (key === 'fullspectrum') {
+        const on = value === 'true';
+        light.fullSpectrum = on;
+        if (state.currentLight.mac === mac) state.currentLight.fullSpectrum = on;
       }
     },
     apiCallSuccess: (state, action) => {
@@ -178,6 +190,7 @@ export const {
   setManualOverride,
   toggleManualRelease,
   updateBrightness,
+  updateFullSpectrum,
   mqttStatusReceived,
   fetchUserDevices,
   fetchUnclaimedDevices,

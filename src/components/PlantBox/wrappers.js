@@ -32,10 +32,10 @@ export const Box = styled.div`
 
 export const SwitchContainer = styled.div`
   display: flex;
-  height: 44px;
+  height: 63px;
   background: #161b22;
   border: 1.5px solid #282e36;
-  border-radius: 22px;
+  border-radius: 32px;
   overflow: hidden;
   margin: 0 0 24px;
   min-width: 0;
@@ -52,7 +52,7 @@ export const SwitchButton = styled.div`
   text-transform: uppercase;
   cursor: ${(props) => (props.active ? 'default' : 'pointer')};
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-  border-radius: 22px;
+  border-radius: 32px;
 
   color: ${(props) => (props.active ? '#fff' : '#4d5566')};
   background: ${(props) =>
@@ -75,6 +75,54 @@ export const SwitchButton = styled.div`
       props.active ? undefined : 'rgba(255,255,255,0.04)'
     };
     color: ${(props) => (props.active ? '#fff' : '#8b949e')};
+  }
+`;
+
+/* Full-spectrum toggle row — mirrors the ON/OFF (all) control on Home */
+export const SpectrumRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #161b22;
+  border: 1.5px solid #282e36;
+  border-radius: 10px;
+  margin: 0 0 24px;
+`;
+
+export const SpectrumLabel = styled.span`
+  font-size: 13px;
+  font-weight: 500;
+  color: #8b949e;
+`;
+
+export const SpectrumToggle = styled.button`
+  width: 44px;
+  height: 24px;
+  background-color: ${(p) => (p.$on ? '#22c55e' : '#30363d')};
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: ${(p) => (p.$on ? '0 0 12px rgba(34,197,94,0.4)' : 'none')};
+
+  &::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: ${(p) => (p.$on ? 'calc(100% - 21px)' : '3px')};
+    transition: left 0.25s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  &:hover {
+    background-color: ${(p) => (p.$on ? '#16a34a' : '#3d444d')};
   }
 `;
 
