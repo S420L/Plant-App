@@ -38,7 +38,11 @@ import {
   TitleRow,
   EditNameButton,
   UnclaimButton,
+  CameraBox,
+  ViewSwitch,
+  ViewSwitchButton,
 } from './wrappers';
+import { CameraView } from '../CameraView';
 
 /* ── Value arrays (defined once outside render) ── */
 /* null is the "no selection" sentinel — rendered as — in the wheel */
@@ -46,6 +50,25 @@ const HOURS_99 = [null, ...Array.from({ length: 100 }, (_, i) => i)];
 const HOURS_12 = [null, ...Array.from({ length: 12 }, (_, i) => i + 1)];
 const MINUTES  = [null, ...Array.from({ length: 60 }, (_, i) => i)];
 const SECONDS  = [null, ...Array.from({ length: 60 }, (_, i) => i)];
+
+/* ── View-switch icons ── */
+const SettingsIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+       strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+    <line x1="3" y1="8" x2="21" y2="8" />
+    <circle cx="9" cy="8" r="2.6" />
+    <line x1="3" y1="16" x2="21" y2="16" />
+    <circle cx="15" cy="16" r="2.6" />
+  </svg>
+);
+
+const CameraIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="2.5" y="6.5" width="13" height="11" rx="2.5" />
+    <path d="M15.5 10.5 L21.5 7.5 V16.5 L15.5 13.5 Z" />
+  </svg>
+);
 
 /* ── WheelPicker component ── */
 const WheelPicker = ({ values, selected, onChange, unit }) => {
@@ -121,9 +144,14 @@ export const PlantBox = () => {
   // Brightness (0-100)
   const [brightness, setBrightness] = useState(100);
 
+  // Settings ⇄ camera view (always opens on settings)
+  const [view, setView] = useState('settings');
+
   // Accordion: which field is expanded
   const [activeField, setActiveField] = useState(null);
   const toggleField = (key) => setActiveField((prev) => (prev === key ? null : key));
+
+  useEffect(() => { setView('settings'); }, [id]);
 
   useEffect(() => {
     const lightIndex = parseInt(id, 10) - 1;
@@ -349,6 +377,27 @@ export const PlantBox = () => {
     </FieldGroup>
   );
 
+  const viewSwitch = (
+    <ViewSwitch onClick={(e) => e.stopPropagation()}>
+      <ViewSwitchButton
+        $active={view === 'settings'}
+        onClick={() => setView('settings')}
+        aria-label="Light settings"
+        title="Settings"
+      >
+        <SettingsIcon />
+      </ViewSwitchButton>
+      <ViewSwitchButton
+        $active={view === 'camera'}
+        onClick={() => setView('camera')}
+        aria-label="Camera feed"
+        title="Camera"
+      >
+        <CameraIcon />
+      </ViewSwitchButton>
+    </ViewSwitch>
+  );
+
   if (id === 'master') {
     return (
       <Box onClick={dismissPicker}>
@@ -362,9 +411,20 @@ export const PlantBox = () => {
     );
   }
 
+  if (view === 'camera') {
+    return (
+      <CameraBox>
+        <CameraView title={`${currentLight.name || 'Light'} camera`} />
+        <BackButton onClick={handleBack}>Back</BackButton>
+        {viewSwitch}
+      </CameraBox>
+    );
+  }
+
   return (
     <Box isOn={currentLight.isOn} onClick={dismissPicker}>
       <BackButton onClick={handleBack}>Back</BackButton>
+      {viewSwitch}
       <ResetButton onClick={handleReset}>Reset</ResetButton>
       <TitleRow>
         <h2>{currentLight.name || 'Unknown Light'}</h2>

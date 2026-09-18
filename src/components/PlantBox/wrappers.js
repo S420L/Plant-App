@@ -572,3 +572,55 @@ export const AmPmButton = styled.button`
   cursor: pointer;
   transition: all 0.15s ease;
 `;
+
+/* ── Settings ⇄ camera view switch ── */
+
+/* Camera screen: same viewport rules as Box, but full-bleed for the feed */
+export const CameraBox = styled.div`
+  min-height: 100dvh;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    min-height: 100%;
+  }
+`;
+
+/* Sits between BackButton and ResetButton in the top chrome row */
+export const ViewSwitch = styled.div`
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: rgba(22, 27, 34, 0.92);
+  border: 1.5px solid #282e36;
+  border-radius: 10px;
+`;
+
+export const ViewSwitchButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 28px;
+  padding: 0;
+  background: ${(p) => (p.$active ? 'rgba(34,197,94,0.15)' : 'transparent')};
+  color: ${(p) => (p.$active ? '#22c55e' : '#4d5566')};
+  border: none;
+  border-radius: 8px;
+  cursor: ${(p) => (p.$active ? 'default' : 'pointer')};
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    color: ${(p) => (p.$active ? '#22c55e' : '#8b949e')};
+    background: ${(p) => (p.$active ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.04)')};
+  }
+
+  &:active { transform: scale(0.97); }
+`;
