@@ -184,9 +184,14 @@ export const lightSlice = createSlice({
     analyzeFootage: (state) => {
       state.analysis = { status: 'running', plant: '', species: '', watering: '', error: '' };
     },
-    analysisFinished: (state, action) => {
-      const { plant, species, watering } = action.payload;
-      state.analysis = { status: 'done', plant, species, watering, error: '' };
+    // Merges whatever the job has so far. The API fills plant, then
+    // species, then watering, so each one lands in the UI as it completes.
+    analysisUpdated: (state, action) => {
+      const { status, plant, species, watering } = action.payload;
+      if (plant !== undefined) state.analysis.plant = plant;
+      if (species !== undefined) state.analysis.species = species;
+      if (watering !== undefined) state.analysis.watering = watering;
+      if (status) state.analysis.status = status;
     },
     analysisFailed: (state, action) => {
       state.analysis.status = 'error';
@@ -224,7 +229,7 @@ export const {
   mergeRegistryDevices,
   setUnclaimedDevices,
   analyzeFootage,
-  analysisFinished,
+  analysisUpdated,
   analysisFailed
 } = lightSlice.actions;
 

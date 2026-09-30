@@ -188,6 +188,14 @@ def ask(b64_image, model_id, prompt, max_tokens, fallback):
     content = (msg.get("content") or "").strip()
     finish = choice.get("finish_reason")
 
+    # Reasoning models sometimes spill the chain-of-thought and its closing
+    # </think> tag into content instead of reasoning_content. Keep only what
+    # follows the last tag, unless that leaves nothing usable.
+    if "</think>" in content:
+        tail = content.rsplit("</think>", 1)[-1].strip()
+        if tail:
+            content = tail
+
     # --- debug output ---
     print(f"  finish_reason: {finish}")
     usage = data.get("usage")
@@ -212,12 +220,18 @@ def ask(b64_image, model_id, prompt, max_tokens, fallback):
     return content
 
 
-def run_analysis():
+def run_analysis(on_result=None):
     """
     Full one-shot run. Returns {"plant", "species", "watering"}.
-    Progress still goes to stdout, so behaviour is identical whether this
-    is called from the command line or from the API.
+
+    on_result(key, value) is called as each of the three answers lands, so
+    a caller can publish them one at a time instead of waiting for all
+    three. Progress still goes to stdout, so behaviour is identical whether
+    this is called from the command line or from the API.
     """
+    def publish(key, value):
+        if on_result:
+            on_result(key, value)
     # Clear first: if the fetch fails, an empty folder correctly shows
     # that nothing was sent this run.
     prepare_screenshot_dir()
@@ -239,12 +253,15 @@ def run_analysis():
 
     print("Q1: are there plants?")
     plant = ask(b64_full, model_id, PROMPT_IS_PLANT, max_tokens=2048, fallback="UNKNOWN")
+    publish("plant", plant)
 
     print("\nQ2: what plant is it?")
     species = ask(b64_full, model_id, PROMPT_SPECIES, max_tokens=8192, fallback="UNKNOWN")
+    publish("species", species)
 
     print("\nQ3: does it need watering? (soil crop)")
     watering = ask(b64_soil, model_id, PROMPT_WATERING, max_tokens=4096, fallback="UNSURE")
+    publish("watering", watering)
 
     return {"plant": plant, "species": species, "watering": watering}
 

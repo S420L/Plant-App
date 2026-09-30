@@ -416,7 +416,17 @@ async def _run_analysis_job(job_id: str) -> None:
             sys.path.insert(0, str(APP_DIR))
         from AItest import run_analysis
 
-        result = await asyncio.to_thread(run_analysis)
+        # Each answer is written into the job as it lands, so a client
+        # polling mid-run sees PLANT before SPECIES and SPECIES before
+        # WATERING rather than all three at the end. Called from the worker
+        # thread; a single dict item assignment is atomic, which is all the
+        # synchronisation this needs.
+        def on_result(key: str, value: str) -> None:
+            job = _analysis_jobs.get(job_id)
+            if job is not None:
+                job[key] = value
+
+        result = await asyncio.to_thread(run_analysis, on_result)
         _analysis_jobs[job_id].update(status="done", **result)
     except Exception as e:
         _analysis_jobs[job_id].update(status="error", error=f"{type(e).__name__}: {e}")

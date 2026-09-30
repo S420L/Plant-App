@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 /* Fills the camera screen: controls on top, feed taking the rest */
 export const CameraScreen = styled.div`
@@ -55,10 +55,13 @@ export const ResultsPanel = styled.div`
   overflow-y: auto;
 `;
 
+/* Each question owns a colour: plant green, species purple, watering blue */
 export const ResultRow = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3px;
+  padding-left: 10px;
+  border-left: 2px solid ${(p) => p.$accent || '#282e36'};
 `;
 
 export const ResultLabel = styled.span`
@@ -66,7 +69,30 @@ export const ResultLabel = styled.span`
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8b949e;
+  color: ${(p) => p.$accent || '#8b949e'};
+`;
+
+const dotPulse = keyframes`
+  0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+  40%           { opacity: 1;    transform: translateY(-2px); }
+`;
+
+/* Same height as one line of ResultValue, so the row doesn't jump when the
+   answer replaces the dots */
+export const Dots = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 19px;
+`;
+
+export const Dot = styled.span`
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: ${(p) => p.$accent || '#8b949e'};
+  animation: ${dotPulse} 1.2s ease-in-out infinite;
+  animation-delay: ${(p) => (p.$i || 0) * 0.16}s;
 `;
 
 export const ResultValue = styled.span`

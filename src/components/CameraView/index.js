@@ -11,6 +11,8 @@ import {
   ResultValue,
   ResultNote,
   ResultError,
+  Dots,
+  Dot,
   CameraStage,
   CameraFrame,
   CameraPlaceholder,
@@ -21,6 +23,21 @@ import {
 /* Single shared feed for now — every light points here until per-device
    camera URLs land in the registry. */
 export const CAMERA_URL = 'https://testcam.site';
+
+/* One colour per question, in the order AItest.py answers them */
+const RESULT_ROWS = [
+  { key: 'plant',    label: 'Plant',    accent: '#22c55e' },
+  { key: 'species',  label: 'Species',  accent: '#a855f7' },
+  { key: 'watering', label: 'Watering', accent: '#60a5fa' },
+];
+
+const LoadingDots = ({ accent }) => (
+  <Dots aria-label="Working">
+    <Dot $accent={accent} $i={0} />
+    <Dot $accent={accent} $i={1} />
+    <Dot $accent={accent} $i={2} />
+  </Dots>
+);
 
 export const CameraView = ({ src = CAMERA_URL, title = 'Camera feed' }) => {
   const dispatch = useDispatch();
@@ -41,29 +58,24 @@ export const CameraView = ({ src = CAMERA_URL, title = 'Camera feed' }) => {
           <ResultNote>Reading the frame — this takes a minute or two.</ResultNote>
         )}
 
-        {analysis.status === 'done' && (
+        {analysis.status !== 'idle' && (
           <ResultsPanel>
-            <ResultRow>
-              <ResultLabel>Plant</ResultLabel>
-              <ResultValue>{analysis.plant || '—'}</ResultValue>
-            </ResultRow>
-            <ResultRow>
-              <ResultLabel>Species</ResultLabel>
-              <ResultValue>{analysis.species || '—'}</ResultValue>
-            </ResultRow>
-            <ResultRow>
-              <ResultLabel>Watering</ResultLabel>
-              <ResultValue>{analysis.watering || '—'}</ResultValue>
-            </ResultRow>
-          </ResultsPanel>
-        )}
-
-        {analysis.status === 'error' && (
-          <ResultsPanel>
-            <ResultRow>
-              <ResultLabel>Analysis failed</ResultLabel>
-              <ResultError>{analysis.error}</ResultError>
-            </ResultRow>
+            {RESULT_ROWS.map(({ key, label, accent }) => (
+              <ResultRow key={key} $accent={accent}>
+                <ResultLabel $accent={accent}>{label}</ResultLabel>
+                {analysis[key]
+                  ? <ResultValue>{analysis[key]}</ResultValue>
+                  : running
+                    ? <LoadingDots accent={accent} />
+                    : <ResultValue>—</ResultValue>}
+              </ResultRow>
+            ))}
+            {analysis.status === 'error' && (
+              <ResultRow $accent="#ef4444">
+                <ResultLabel $accent="#ef4444">Analysis failed</ResultLabel>
+                <ResultError>{analysis.error}</ResultError>
+              </ResultRow>
+            )}
           </ResultsPanel>
         )}
       </AnalyzePanel>

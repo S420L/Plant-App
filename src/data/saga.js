@@ -22,7 +22,7 @@ import {
   setUnclaimedDevices,
   updateLightState,
   analyzeFootage,
-  analysisFinished,
+  analysisUpdated,
   analysisFailed,
 } from './slice';
 
@@ -239,7 +239,9 @@ function* handleTimeRangeChange(action) {
 // ---------- Camera analysis ----------
 
 // The API runs AItest.py as a background job because three vision-model
-// calls take minutes; we start it, then poll until it settles.
+// calls take minutes; we start it, then poll until it settles. Each poll
+// carries whatever answers have landed so far, so the UI fills in one row
+// at a time rather than all three at the end.
 const ANALYSIS_POLL_MS = 2000;
 const ANALYSIS_MAX_POLLS = 180;   // ~6 minutes
 
@@ -250,18 +252,20 @@ function* handleAnalyzeFootage() {
 
     for (let i = 0; i < ANALYSIS_MAX_POLLS; i += 1) {
       const { data } = yield call(axios.get, `${API_BASE}/api/analyze/${jobId}`);
-      if (data.status === 'done') {
-        yield put(analysisFinished({
-          plant: data.plant || '',
-          species: data.species || '',
-          watering: data.watering || '',
-        }));
-        return;
-      }
+
       if (data.status === 'error') {
         yield put(analysisFailed(data.error || 'Analysis failed'));
         return;
       }
+
+      yield put(analysisUpdated({
+        status: data.status,
+        plant: data.plant,
+        species: data.species,
+        watering: data.watering,
+      }));
+      if (data.status === 'done') return;
+
       yield delay(ANALYSIS_POLL_MS);
     }
     // The job may still finish server-side; we just stop waiting on it.
