@@ -1,12 +1,101 @@
 import styled from 'styled-components';
 
-/* Full-bleed stage — fills the PlantBox camera screen edge to edge */
-export const CameraStage = styled.div`
+/* Fills the camera screen: controls on top, feed taking the rest */
+export const CameraScreen = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0d1117;
+`;
+
+/* Clears the absolute Back button / view switch above it */
+export const AnalyzePanel = styled.div`
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 68px 16px 12px;
+`;
+
+export const AnalyzeButton = styled.button`
+  padding: 13px 20px;
+  background: ${(p) => (p.disabled ? '#21262d' : 'linear-gradient(135deg, #16a34a, #22c55e)')};
+  color: ${(p) => (p.disabled ? '#4d5566' : '#fff')};
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 10px;
+  cursor: ${(p) => (p.disabled ? 'default' : 'pointer')};
+  transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: ${(p) => (p.disabled ? 'none' : '0 4px 16px rgba(34, 197, 94, 0.25)')};
+
+  &:hover:enabled {
+    opacity: 0.9;
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+  }
+
+  &:active:enabled { transform: scale(0.98); }
+`;
+
+export const ResultsPanel = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #161b22;
+  border: 1.5px solid #282e36;
+  border-radius: 12px;
+  padding: 12px 14px;
+  max-height: 34dvh;
+  overflow-y: auto;
+`;
+
+export const ResultRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+`;
+
+export const ResultLabel = styled.span`
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8b949e;
+`;
+
+export const ResultValue = styled.span`
+  font-size: 13px;
+  font-weight: 500;
+  color: #e6edf3;
+  line-height: 1.45;
+  white-space: pre-wrap;
+`;
+
+export const ResultNote = styled.span`
+  font-size: 12px;
+  font-weight: 500;
+  color: #8b949e;
+  text-align: center;
+`;
+
+export const ResultError = styled.span`
+  font-size: 12px;
+  font-weight: 500;
+  color: #ef4444;
+  line-height: 1.45;
+`;
+
+/* Full-bleed stage — takes whatever height the controls leave */
+export const CameraStage = styled.div`
+  flex: 1;
+  min-height: 0;
+  position: relative;
   background: #000;
   overflow: hidden;
 `;

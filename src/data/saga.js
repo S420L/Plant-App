@@ -1,4 +1,4 @@
-import { takeLatest, throttle, put, call, select, spawn, take } from 'redux-saga/effects';
+import { takeLatest, takeLeading, throttle, put, call, select, spawn, take, delay } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import mqtt from 'mqtt';
 import axios from 'axios';
@@ -21,6 +21,9 @@ import {
   mergeRegistryDevices,
   setUnclaimedDevices,
   updateLightState,
+  analyzeFootage,
+  analysisFinished,
+  analysisFailed,
 } from './slice';
 
 const API_BASE = 'https://server67.site';
@@ -233,6 +236,42 @@ function* handleTimeRangeChange(action) {
   }
 }
 
+// ---------- Camera analysis ----------
+
+// The API runs AItest.py as a background job because three vision-model
+// calls take minutes; we start it, then poll until it settles.
+const ANALYSIS_POLL_MS = 2000;
+const ANALYSIS_MAX_POLLS = 180;   // ~6 minutes
+
+function* handleAnalyzeFootage() {
+  try {
+    const start = yield call(axios.post, `${API_BASE}/api/analyze`, {});
+    const jobId = start.data.job_id;
+
+    for (let i = 0; i < ANALYSIS_MAX_POLLS; i += 1) {
+      const { data } = yield call(axios.get, `${API_BASE}/api/analyze/${jobId}`);
+      if (data.status === 'done') {
+        yield put(analysisFinished({
+          plant: data.plant || '',
+          species: data.species || '',
+          watering: data.watering || '',
+        }));
+        return;
+      }
+      if (data.status === 'error') {
+        yield put(analysisFailed(data.error || 'Analysis failed'));
+        return;
+      }
+      yield delay(ANALYSIS_POLL_MS);
+    }
+    // The job may still finish server-side; we just stop waiting on it.
+    yield put(analysisFailed('Timed out waiting for the analysis'));
+  } catch (err) {
+    console.error('analyzeFootage failed:', err);
+    yield put(analysisFailed(err.response?.data?.detail || err.message || 'Analysis failed'));
+  }
+}
+
 // ---------- Root saga ----------
 
 export default function* rootSaga() {
@@ -254,6 +293,8 @@ export default function* rootSaga() {
   yield takeLatest(claimDevice.type, handleClaimDevice);
   yield takeLatest(renameDevice.type, handleRenameDevice);
   yield takeLatest(unclaimDevice.type, handleUnclaimDevice);
+  // takeLeading: a double-press can't start a second run alongside the first.
+  yield takeLeading(analyzeFootage.type, handleAnalyzeFootage);
 
   yield spawn(watchMqtt);
 }

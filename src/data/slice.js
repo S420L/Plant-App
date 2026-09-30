@@ -23,6 +23,15 @@ const initialState = {
   viewingIsOn: false,
   manualOverride: true,
   unclaimedDevices: [],
+  // Camera analysis (AItest.py via POST /api/analyze). One shared feed for
+  // now, so one shared result rather than one per MAC.
+  analysis: {
+    status: 'idle',   // idle | running | done | error
+    plant: '',
+    species: '',
+    watering: '',
+    error: '',
+  },
 };
 
 export const lightSlice = createSlice({
@@ -170,6 +179,19 @@ export const lightSlice = createSlice({
         if (state.currentLight.mac === mac) state.currentLight.fullSpectrum = on;
       }
     },
+    // Saga trigger + optimistic lock — flips the button to its disabled
+    // state the moment it's pressed, before the POST comes back.
+    analyzeFootage: (state) => {
+      state.analysis = { status: 'running', plant: '', species: '', watering: '', error: '' };
+    },
+    analysisFinished: (state, action) => {
+      const { plant, species, watering } = action.payload;
+      state.analysis = { status: 'done', plant, species, watering, error: '' };
+    },
+    analysisFailed: (state, action) => {
+      state.analysis.status = 'error';
+      state.analysis.error = action.payload || 'Analysis failed';
+    },
     apiCallSuccess: (state, action) => {
       console.log('API Success:', action.payload);
     },
@@ -200,7 +222,10 @@ export const {
   removeLight,
   renameLight,
   mergeRegistryDevices,
-  setUnclaimedDevices
+  setUnclaimedDevices,
+  analyzeFootage,
+  analysisFinished,
+  analysisFailed
 } = lightSlice.actions;
 
 export const lightReducer = lightSlice.reducer;

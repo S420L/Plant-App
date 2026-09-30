@@ -1,7 +1,9 @@
 import asyncio
 import os
+import sys
 import uuid
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Optional
 
 import aiohttp
@@ -369,3 +371,82 @@ async def rename_device(
     session.add(ud)
     await session.commit()
     return {"mac": ud.mac, "nickname": ud.nickname}
+
+
+# ---------- Camera analysis (AItest.py) ----------
+#
+# AItest.py pulls a frame off the camera relay and asks the local LM Studio
+# vision model three questions. That takes minutes, not seconds, so the PWA
+# starts a job and polls it instead of holding one long request open — a
+# synchronous call would die on nginx's proxy_read_timeout long before the
+# model answered.
+
+APP_DIR = Path(__file__).resolve().parent
+
+MAX_ANALYSIS_JOBS = 20
+
+# job_id -> {status: running|done|error, plant, species, watering, error, started_at}
+_analysis_jobs: dict[str, dict] = {}
+_analysis_running: Optional[str] = None
+# Held so the event loop can't garbage-collect a job mid-run.
+_analysis_tasks: set = set()
+
+
+def _job_public(job_id: str) -> dict:
+    job = _analysis_jobs[job_id]
+    return {"job_id": job_id, **{k: v for k, v in job.items() if k != "started_at"}}
+
+
+def _prune_analysis_jobs() -> None:
+    finished = sorted(
+        (j for j in _analysis_jobs if _analysis_jobs[j]["status"] != "running"),
+        key=lambda j: _analysis_jobs[j]["started_at"],
+    )
+    while len(_analysis_jobs) >= MAX_ANALYSIS_JOBS and finished:
+        del _analysis_jobs[finished.pop(0)]
+
+
+async def _run_analysis_job(job_id: str) -> None:
+    global _analysis_running
+    try:
+        # Imported lazily, from this file's own directory: Pillow and the
+        # camera/LM Studio hosts only have to be reachable when someone
+        # actually presses Analyze, not at service start.
+        if str(APP_DIR) not in sys.path:
+            sys.path.insert(0, str(APP_DIR))
+        from AItest import run_analysis
+
+        result = await asyncio.to_thread(run_analysis)
+        _analysis_jobs[job_id].update(status="done", **result)
+    except Exception as e:
+        _analysis_jobs[job_id].update(status="error", error=f"{type(e).__name__}: {e}")
+    finally:
+        if _analysis_running == job_id:
+            _analysis_running = None
+
+
+@app.post("/api/analyze")
+async def start_analysis(_user: User = Depends(get_current_user)):
+    global _analysis_running
+    # One run at a time: LM Studio serves a single request anyway, so a
+    # second press attaches to the run already in flight.
+    if _analysis_running and _analysis_jobs.get(_analysis_running, {}).get("status") == "running":
+        return _job_public(_analysis_running)
+
+    _prune_analysis_jobs()
+    job_id = str(uuid.uuid4())
+    _analysis_jobs[job_id] = {"status": "running", "started_at": datetime.utcnow()}
+    _analysis_running = job_id
+
+    task = asyncio.create_task(_run_analysis_job(job_id))
+    _analysis_tasks.add(task)
+    task.add_done_callback(_analysis_tasks.discard)
+
+    return _job_public(job_id)
+
+
+@app.get("/api/analyze/{job_id}")
+async def get_analysis(job_id: str, _user: User = Depends(get_current_user)):
+    if job_id not in _analysis_jobs:
+        raise HTTPException(status_code=404, detail="Unknown analysis job")
+    return _job_public(job_id)
